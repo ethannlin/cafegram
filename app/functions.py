@@ -1,0 +1,351 @@
+import base64
+import json
+import random
+import string
+import requests
+import logging
+import time
+from flask import current_app as app, session
+
+'''
+    Function: get_state_key
+    -----------------------
+    Returns a randomly generated string of length n
+    Used for CSRF protection when retrieving access token
+'''
+def get_state_key(n: int) -> str:
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=n))
+
+'''
+    Function: get_token
+    -------------------
+    Returns access token, refresh token, and expiration time in seconds
+    Returns None if error occurs
+'''
+def get_token(code):
+    client_id = app.config['CLIENT_ID']
+    client_secret = app.config['CLIENT_SECRET']
+    redirect_uri = app.config['REDIRECT_URI']
+    
+    token_url = 'https://accounts.spotify.com/api/token'
+
+    headers = {
+        'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
+        'Content-Type' : 'application/x-www-form-urlencoded'
+        }
+    
+    body = {
+        'grant_type' : 'authorization_code',
+        'code' : code,
+        'redirect_uri' : redirect_uri
+    }
+
+    response = requests.post(token_url, headers=headers, data=body)
+
+    # 200 code indicates access token was properly granted
+    if response.status_code == 200:
+        json = response.json()
+        return json['access_token'], json['refresh_token'], json['expires_in']
+    else:
+        logging.error('get_token:' + str(response.status_code))
+        return None
+    
+'''
+    Function: refresh_token
+    -----------------------
+    Returns new access token, refresh token, and expiration time in seconds
+    Returns None if error occurs
+'''
+def refresh_token(refresh_token):
+    client_id = app.config['CLIENT_ID']
+    client_secret = app.config['CLIENT_SECRET']
+
+    token_url = 'https://accounts.spotify.com/api/token'
+
+    headers = {
+        'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
+        'Content-Type' : 'application/x-www-form-urlencoded'
+    }
+    
+    body = {
+        'grant_type' : 'refresh_token',
+        'refresh_token' : refresh_token
+    }
+
+    response = requests.post(token_url, headers=headers, data=body)
+
+    # 200 code indicates access token was properly granted
+    if response.status_code == 200:
+        json = response.json()
+        return json['access_token'], json['expires_in']
+    else:
+        logging.error('refresh_token:' + str(response.status_code))
+        return None
+
+'''
+    Function: check_token
+    ---------------------
+    Returns true if access token is still valid
+    If access token is expired, refreshes token and returns true if successful
+'''
+def check_token(session):
+    if time.time() > session['expires_in']:
+        token = refresh_token(session['refresh_token'])
+        if token is not None:
+            session['token'] = token[0]
+            session['expires_in'] = time.time() + token[1]
+        else:
+            logging.error('check_token_error')
+            return False
+
+    return True
+
+'''
+    Request Functions
+'''
+
+'''
+    Function: get_request
+    ---------------------
+    Returns json response from get request
+    Returns status code if error occurs
+'''
+def get_request(session, url, params={}):
+    headers = {
+        'Authorization' : 'Bearer ' + session['token']
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        return response.json()
+    
+    if response.status_code == 401 and check_token(session):
+        return get_request(session, url, params)
+    else:
+        logging.error('get_request:' + str(response.status_code))
+        return response.status_code
+    
+'''
+    Function: post_request
+    ----------------------
+    Returns json response from post request
+    Returns status code if error occurs
+'''
+def post_request(session, url, params={}):
+    headers = {
+        'Authorization' : 'Bearer ' + session['token']
+    }
+
+    response = requests.post(url, headers=headers, params=params)
+
+    if response.status_code == 201:
+        return response.json()
+    
+    if response.status_code == 401 and check_token(session):
+        return post_request(session, url, params)
+    else:
+        logging.error('post_request:' + str(response.status_code))
+        return response.status_code
+    
+'''
+    Function: put_request
+    ---------------------
+    Returns json response from put request
+    Returns status code if error occurs
+'''
+def put_request(session, url, params={}):
+    headers = {
+        'Authorization' : 'Bearer ' + session['token']
+    }
+
+    response = requests.put(url, headers=headers, params=params)
+
+    if response.status_code == 204 or response.status_code == 202:
+        return response.status_code
+    
+    else:
+        logging.error('put_request:' + str(response.status_code))
+        return response.text
+
+'''
+    Function: delete_request
+    ------------------------
+    Returns json response from delete request
+    Returns status code if error occurs
+'''
+def delete_request(session, url, params={}):
+    headers = {
+        'Authorization' : 'Bearer ' + session['token']
+    }
+
+    response = requests.delete(url, headers=headers, params=params)
+
+    if response.status_code == 200:
+        return response.json()
+    
+    if response.status_code == 401 and check_token(session):
+        return delete_request(session, url, params)
+    else:
+        logging.error('delete_request:' + str(response.status_code))
+        return response.text
+    
+'''
+    Function: toggle_shuffle
+    ------------------------
+    Toggles shuffle state
+    Returns status code if error occurs
+'''
+def toggle_shuffle(session, state):
+    url = 'https://api.spotify.com/v1/me/player/shuffle'
+
+    params = {
+        'state' : state
+    }
+
+    return put_request(session, url, params)
+
+'''
+    Function: toggle_repeat
+    -----------------------
+    Toggles repeat state
+    Returns status code if error occurs
+'''
+def toggle_repeat(session, state):
+    url = 'https://api.spotify.com/v1/me/player/repeat'
+
+    params = {
+        'state' : state
+    }
+
+    return put_request(session, url, params)
+
+'''
+    Function: transfer_playback
+    ---------------------------
+    Transfers playback to device
+    Returns status code if error occurs
+'''
+def transfer_playback(session, device_id):
+    url = 'https://api.spotify.com/v1/me/player'
+
+    headers = {
+        'Authorization' : 'Bearer ' + session['token'],
+        'Content-Type' : 'application/json'
+    }
+
+    data = {
+        "device_ids": [device_id]
+    }
+
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code == 204 or response.status_code == 202:
+        return response.status_code
+    
+    if response.status_code == 401 and check_token(session):
+        return transfer_playback(session, device_id)
+    else:
+        logging.error('put_request:' + str(response.status_code))
+        return response.text
+    
+'''
+    Function: search_spotify
+    ------------------------
+    Returns json response from search request
+    Returns status code if error occurs
+'''
+def search_spotify(session, query, type, limit=5):
+    url = 'https://api.spotify.com/v1/search'
+
+    if type == 'create':
+        params = {
+            'q' : query,
+            'type' : 'artist,track',
+            'limit' : limit
+        }
+    else:
+        params = {
+            'q' : query,
+            'type' : type,
+            'limit' : limit
+        }
+
+    response = get_request(session, url, params)
+
+    try:
+        if 'error' in response:
+            return None
+    except:
+        return response
+        
+    results = []
+
+    if type == 'create':
+        for artist in response['artists']['items']:
+            results.append([artist['name'], 'a:'+artist['id'], artist['popularity']])
+        for track in response['tracks']['items']:
+            name = track['name'] + ' by ' + track['artists'][0]['name']
+            results.append([name, 't:'+track['id'], track['popularity']])
+        results.sort(key=lambda x: x[2], reverse=True)
+
+    if type == 'artist':
+        for artist in response['artists']['items']:
+            results.append([artist['name'], artist['uri'], artist['popularity']])
+        results.sort(key=lambda x: x[2], reverse=True)
+
+    if type == 'track':
+        for track in response['tracks']['items']:
+            name = track['name'] + ' by ' + track['artists'][0]['name']
+            results.append([name, track['uri'], track['popularity']])
+        results.sort(key=lambda x: x[2], reverse=True)
+
+    if type == 'playlist':
+        for playlist in response['playlists']['items']:
+            name = playlist['name'] + ' by ' + playlist['owner']['display_name']
+            results.append([name, playlist['uri']])
+
+    if type == 'album':
+        for album in response['albums']['items']:
+            name = album['name'] + ' by ' + album['artists'][0]['name']
+            results.append([name, album['uri']])
+
+    results_json = []
+    for item in results:
+        results_json.append({'label' : item[0], 'value' : item[1]})
+    
+    return results_json
+
+'''
+    Function: play
+    --------------
+    Plays track, artist, album, or playlist
+    Returns status code if error occurs
+'''
+def play(session, type, uri):
+    url = 'https://api.spotify.com/v1/me/player/play'
+
+    headers = {
+        'Authorization' : 'Bearer ' + session['token'],
+        'Content-Type' : 'application/json'
+    }
+
+    if type == 'track':
+        data = {
+            "uris": [uri]
+        }
+    else:
+        data = {
+            "context_uri": uri
+        }
+
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code == 204 or response.status_code == 202:
+        return response.status_code
+    
+    if response.status_code == 401 and check_token(session):
+        return play(session, type, uri)
+    else:
+        logging.error('put_request:' + str(response.status_code))
+        return response.text

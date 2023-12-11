@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block head %}
+	{{ super() }}
+	<script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="py-5">
+    <div class="container">
+      <div class="row page-info">
+      	<div class="col-12 col-lg-4">
+      		<h1>Privacy</h1>
+      	</div>
+      	<div class="col-12 col-lg-8" style="margin-top: 50px;">
+      		<p>in order to access features within the spotify SDK, this application needs your permission to enable user scopes (such as 'playlist-modify-public' which allows us to create playlists and add tracks on your behalf). we do not store or distribute any of your information. permission can be revoked through <a href="https://www.spotify.com/us/account/apps/" class="hyperlink-black">this page</a>.</p>
+			<p style="font-weight: bold;">note: due to limitations with the spotify SDK, this app will only work for spotify premium users.</p>
+		</div>
+      </div>
+
+
+      <div class="row page-info">
+      	<div class="col-12 col-lg-4">
+      		<h1>cafégram</h1>
+      	</div>
+      	<div class="col-12 col-lg-8" style="margin-top: 25px;">
+      		<p>cafégram aims to offer users a relaxing and enjoyable environment, merging the joy of music with the coziness of a cafe setting. It serves as a digital retreat where users can unwind, discover new music, and experience a cafe-like ambiance from the comfort of their own devices. It provides an immersive experience by simulating a cafe environment virtually, allowing users to explore and listen to music from spotify's extensive library.</p>
+      	</div>
+      </div>
+
+      <div class="row page-info">
+      	<div class="col-12 col-lg-4">
+      		<h1>discover</h1>
+      	</div>
+      	<div class="col-12 col-lg-8" style="margin-top: 50px;">
+      		<p></p>
+      	</div>
+      </div>
+
+      <div class="row page-info">
+      	<div class="col-12 col-lg-4">
+      		<h1>create</h1>
+      	</div>
+      	<div class="col-12 col-lg-8" style="margin-top: 50px;">
+      		<p></p>
+      	</div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}

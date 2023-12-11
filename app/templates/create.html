@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block head %}
+	{{ super() }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row page-info">
+        <div class="col-12 col-lg-4">
+            <h1>Create Playlist</h1>
+        </div>
+        <div class="col-12 col-lg-8">
+            <p>discover your perfect playlist! share up to 5 of your favorite songs or artists, and we'll curate a personalized playlist just for you. tailor your experience by fine-tuning specific attributes like energy and popularity to craft the ideal mix of tracks that resonate with your taste in music. let's create your musical journey together!</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <input type="text" id="search-input" placeholder="search for a song or artist" class="form-control input-lg" style="margin-bottom: 20px;"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div id="selectedItems"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 text-center">
+            <button type="button" class="btn btn-default" style="margin-top: 15px; background-color: #302c2c;" data-toggle="modal" data-target="#seed-modal">
+            <p style="margin-top: 10px; color: #bfbfbf">create playlist</p>
+            </button>
+        </div>
+    </div>
+
+    <div id="seed-modal" class="modal">
+        <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close" style="position: absolute; top: 10px; right: 20px;" data-dismiss="modal">&times;</span>
+        <h1 class="text-center">create your new playlist!</h1>
+        <p style="padding: 10px;">create a spotify playlist using your specified tracks and artists. you can set target values for selected tuneable attributes below. unselected parameters won't influence the generated playlist.</p>
+        <div class="row">
+            <div class="col-12" style="padding-left: 20px; padding-right: 20px;">
+                <label for="playlistName">playlist name</label>
+                <input type="text" id="playlist-name" placeholder="enter playlist name" class="form-control">
+            </div>
+        </div>
+    
+        <form id="playlist-form">
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-sm-4">
+                    <label class="form-check-label" for="limitLevel" data-toggle="tooltip" data-placement="right" title="max number of tracks in new playlist">track limit</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_limit" id="sliderLimitRange" class="slider-range custom-range border-0" type="range" min="0" max="100" value="50">
+                    <span class="slider-value" id="sliderLimitValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 20px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="acoustic_level" id="acousticLevel">
+                    <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acousticness</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderAcousticValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="danceability_level" id="danceabilityLevel">
+                    <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceability</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderDanceabilityValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="energy_level" id="energyLevel">
+                    <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energy</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_energy" id="sliderEnergyRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderEnergyValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="intrumental_level" id="instrumentalLevel">
+                    <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumentalness</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderInstrumentalValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="lively_level" id="livelyLevel">
+                    <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">liveliness</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_lively" id="sliderLivelyRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderLivelyValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="popularity_level" id="popularityLevel">
+                    <label class="form-check-label" for="popularityLevel" data-toggle="tooltip" data-placement="right" title="the popularity of the track. the value will be between 0 and 100, with 100 being the most popular.">popularity</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_popularity" id="sliderPopularityRange" class="slider-range custom-range border-0" type="range" min="0" max="100" value="50">
+                    <span class="slider-value" id="sliderPopularityValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="speech_level" id="speechLevel">
+                    <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechiness</label>
+                </div>
+                <div class="col-sm-8">
+                    <input name="slider_speech" id="sliderSpeechRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderSpeechValue">0</span>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 5px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="valence_level" id="valenceLevel">
+                <label class="form-check-label" for="valenceLevel" data-toggle="tooltip" data-placement="right" title="a measure from 0.0 (sad, depressed, angry) to 1.0 (happy, cheerful, euphoric) describing the musical positiveness conveyed by a track.">valence</label>
+            </div>
+                <div class="col-sm-8">
+                    <input name="slider_valence" id="sliderValenceRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                    <span class="slider-value" id="sliderValenceValue">0</span>
+                </div>
+            </div>
+        </form>
+            <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">Create Playlist</button>   
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        // Activated when user attempts to create a new playlist
+        $('#createBtn').click(function() {
+            // Get all elements within the div with the ID selectedItems
+            const selectedItems = document.getElementById('selectedItems').querySelectorAll('[data-id]');
+
+            // Iterate through the elements and access their data-id attribute
+            var counter = 0;
+            var ids = '';
+            selectedItems.forEach(item => {
+                const dataId = item.getAttribute('data-id');
+
+                ids += '&' + counter.toString() + '=' + dataId;
+                counter += 1;
+            });
+
+            // Make sure at least one track or artist was entered
+            if (counter == 0) {
+                alert('A minimum of one track or artist must be entered to create the playlist.');
+            } else {
+                // remove all items from the selectedItems div
+                $('#selectedItems').empty();
+
+                // make ajax call to create playlist
+                console.log(ids);
+            }
+
+        });
+
+        // Show/hide sliders when attributes in form are selected/unselected
+        $('input.form-check-input').change(function(){
+            if ($(this).is(':checked')) {
+                $(this).parent().next().find('.slider-range').prop('disabled', false);
+            }
+            else {
+                $(this).parent().next().find('.slider-range').prop('disabled', true);
+            }
+        }).change();
+
+        // Show value of slider next to slider bar
+        const $limitVal = $('#sliderLimitValue');
+        const $limitRange = $('#sliderLimitRange');
+        $limitVal.html($limitRange.val());
+        $limitRange.on('input change', () => {
+            $limitVal.html($limitRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $acousticVal = $('#sliderAcousticValue');
+        const $acousticRange = $('#sliderAcousticRange');
+        $acousticVal.html($acousticRange.val());
+        $acousticRange.on('input change', () => {
+            $acousticVal.html($acousticRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $danceabilityVal = $('#sliderDanceabilityValue');
+        const $danceabilityRange = $('#sliderDanceabilityRange');
+        $danceabilityVal.html($danceabilityRange.val());
+        $danceabilityRange.on('input change', () => {
+            $danceabilityVal.html($danceabilityRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $instrumentalVal = $('#sliderInstrumentalValue');
+        const $instrumentalRange = $('#sliderInstrumentalRange');
+        $instrumentalVal.html($instrumentalRange.val());
+        $instrumentalRange.on('input change', () => {
+            $instrumentalVal.html($instrumentalRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $livelyVal = $('#sliderLivelyValue');
+        const $livelyRange = $('#sliderLivelyRange');
+        $livelyVal.html($livelyRange.val());
+        $livelyRange.on('input change', () => {
+            $livelyVal.html($livelyRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $energyVal = $('#sliderEnergyValue');
+        const $energyRange = $('#sliderEnergyRange');
+        $energyVal.html($energyRange.val());
+        $energyRange.on('input change', () => {
+            $energyVal.html($energyRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $popularityVal = $('#sliderPopularityValue');
+        const $popularityRange = $('#sliderPopularityRange');
+        $popularityVal.html($popularityRange.val());
+        $popularityRange.on('input change', () => {
+            $popularityVal.html($popularityRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $speechVal = $('#sliderSpeechValue');
+        const $speechRange = $('#sliderSpeechRange');
+        $speechVal.html($speechRange.val());
+        $speechRange.on('input change', () => {
+        $speechVal.html($speechRange.val());
+        });
+
+        // Show value of slider next to slider bar
+        const $valenceVal = $('#sliderValenceValue');
+        const $valenceRange = $('#sliderValenceRange');
+        $valenceVal.html($valenceRange.val());
+        $valenceRange.on('input change', () => {
+            $valenceVal.html($valenceRange.val());
+        });
+
+        // Autocomplete search
+        $(document).ready(function() {
+            $('#search-input').autocomplete({
+                source: function(request, response) {
+                    // console.log('request: ', request.term)
+                    // console.log('response: ', response)
+
+                    $.getJSON('/api/autocomplete', {
+                        query: request.term,
+                        type: 'create'
+                    }, function(data) {
+                        response(data);
+                    });
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    $('#search-input').val('');
+                    createSelected(ui.item.label, ui.item.value);
+                    return false;
+                }
+            });
+        });
+
+        // Show user selected track and artist names
+        function createSelected (label, value) {
+            // Check if the data-id already exists
+            if ($('#selectedItems').find('[data-id="' + value + '"]').length === 0) {
+                // Check if the number of items is less than 5
+                if ($('#selectedItems').children().length < 5) {
+                    // Append new item if conditions are met
+                    $('#selectedItems').append('<a class="list-group-item"><span data-id="' + value + '">' + label + '</span><span><span class="btn btn-xs btn-default" style="float: right;" onclick="removeSelected(this);">&times;</span></span></a>');
+                } else {
+                    // If the maximum number of items (5) is reached, show an alert
+                    alert('You can only select up to 5 items.');
+                }
+            } else {
+                // If the data-id already exists, show an alert
+                alert('This item is already selected.');
+            }
+        };
+
+        // Remove user selected track and artist names
+        removeSelected = function(span) {
+            span.parentNode.parentNode.remove();
+        };
+
+    </script>
+{% endblock %}

@@ -1,0 +1,86 @@
+body {
+    background-color: #ffe8d6;
+    font-family: 'Circular', sans-serif;
+}
+
+.navbar-dark {
+    background-color: #302c2c;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display,
+audio::-webkit-media-controls-timeline,
+video::-webkit-media-controls-timeline {
+    display: none;
+}
+
+.player {
+    width: 75%;
+}
+
+.page-info {
+	color: #302c2c;
+    font-family: 'Circular', sans-serif;
+	display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 30px;
+}
+
+.page-info p {
+  font-size: 1em;
+  font-weight: 400;
+}
+
+.page-info h1 {
+  font-size: 4em;
+  font-weight: 700;
+}
+
+.page-info h3 {
+  font-size: 2em;
+  font-weight: 400;
+}
+
+.vertical-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 75vh; /* Adjust as needed to cover the viewport height */
+}
+
+#seed-modal {
+	z-index: 1042;
+}
+
+.modal-content {
+  background-color: #ffe8d6;
+  position: relative;
+  font-family: 'Circular', sans-serif;
+  display: flex;
+  flex-direction: column; /* To stack child elements vertically */
+  max-width: 720px;
+  width: 100%;
+  border-radius: 2.0rem !important;
+  overflow: hidden;
+  position: absolute;
+  top: 50%; /* Position from the top */
+  left: 50%; /* Position from the left */
+  transform: translate(-50%, -50%); /* Move the modal back by half of its own width and height */
+  padding: 20px;
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}

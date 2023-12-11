@@ -1,0 +1,12 @@
+venv
+config.py
+.env
+logs
+
+app/static/audio
+app/static/images
+app/static/cicon.png
+
+.DS_Store
+
+__pycache__

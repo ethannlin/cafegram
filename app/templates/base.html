@@ -1,0 +1,55 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="icon" href="{{url_for('static', filename='cicon.png') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+{% endblock %}
+
+{% block title %}
+    {% if title %}
+        {{ title }} - cafégram
+    {% else %}
+        Cafegram
+    {% endif %}
+{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-default navbar-dark">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" style="color:#bfbfbf;" href="{{ url_for('main.home') }}">cafégram</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a style="color:#bfbfbf" href="{{ url_for('main.home') }}">home</a></li>
+                    <li><a style="color:#bfbfbf" href="{{ url_for('main.about') }}">about</a></li>
+                    <li><a style="color:#bfbfbf" href="">discover</a></li>
+                    <li><a style="color:#bfbfbf" href="{{ url_for('main.create') }}">create</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% block app_content %}
+    {% endblock %}
+    <footer class="text-center">
+        <small>&#9825; 2023–<script>document.write(new Date().getFullYear())</script>
+            <a href="https://github.com/ethannlin">Ethan Lin</a>
+        </small>
+    </footer>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script>
+{% endblock %}

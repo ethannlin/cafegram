@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+{% endblock %}
+
+{% block app_content %}
+<div class="container-fluid">
+    <div class="col-md-2">
+        <div>
+            <h1 style="font-weight: bold;">cafélib</h1>
+        </div>
+        <div id="test1">
+            <p style="font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test1.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+        <div id="test2">
+            <p style="margin-top:20px;font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test2.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+        <div id="test3">
+            <p style="margin-top:20px;font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test2.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+        <div id="test4">
+            <p style="margin-top:20px;font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test2.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+        <div id="test5">
+            <p style="margin-top:20px;font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test2.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+        <div id="test6">
+            <p style="margin-top:20px;font-weight: bold;">test audio</p>
+            <audio class="player" src="/static/audio/test2.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <img src="/static/images/cafe.png" style="width: 100%; height: 100%; object-fit: contain; margin-top: 20px; margin-bottom: 20px;"/>
+    </div>
+    <div class="col-md-4 text-center vertical-center">
+        {% if token %}
+            <div id="spotify-connect"></div>
+            <div id="spotify-player">
+                <div id="track" style="margin-bottom: 15px;">
+                    <h4 id="track-info" style="font-weight: bold;"></h4>
+                    <img id="album-art" src=""/>
+                </div>
+                <div class="player-container" style="display: flex; flex-direction: column; align-items: center;">
+                    <input type="range" min="0" max="100" value="50" id="volume-slider" style="margin-bottom: 5px; width: 300px;">
+                    <div style="display: flex; justify-content: center;">
+                        <button id="shuffle" style="margin-right: 5px;">s</button>
+                        <button id="prevTrack" style="margin-right: 5px;"><<</button>
+                        <button id="togglePlay" style="margin-right: 5px;"></button>
+                        <button id="nextTrack" style="margin-right: 5px;">>></button>
+                        <button id="repeat">r</button>
+                    </div>
+                    <div class="search" style="margin-top: 20px;">
+                        <h4 style="font-weight: bold; text-align: left;">search</h4>
+                        <input type="text" id="search-input" placeholder="search for a..." style="width: 220px; margin-bottom: 5px; margin-right: 5px;">
+                        <select id="search-type" style="width: 75px;">
+                            <option value="track">track</option>
+                            <option value="artist">artist</option>
+                            <option value="album">album</option>
+                            <option value="playlist">playlist</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <script src="https://sdk.scdn.co/spotify-player.js"></script>
+            <script>
+                const track = {
+                    name: "",
+                    album: {
+                        images: [
+                            { url: "" }
+                        ]
+                    },
+                    artists: [
+                        { name: "" }
+                    ]
+                }
+
+                function toggleTrackDisplay() {
+                    const trackInfo = $('#track-info').text();
+                    const albumArtSrc = $('#album-art').attr('src');
+
+                    if (trackInfo !== '' && albumArtSrc !== '') {
+                        // If track information is displayed, hide the text and show the buttons
+                        $('#spotify-connect').hide();
+                        $('.player-container').show();
+                    } else {
+                        // If track information is not fully displayed, show the text and hide the buttons
+                        $('#spotify-connect').show();
+                        $('.player-container').hide();
+                    }
+                }
+
+                // Call the function on initial load
+                toggleTrackDisplay();
+                
+                window.onSpotifyWebPlaybackSDKReady = () => {
+                    let accessToken = '{{ token }}';
+                    let expirationTime = '{{ expires_in }}';
+
+                    // Function to check if the token needs refreshing
+                    function tokenNeedsRefresh(expiration) {
+                        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+                        return currentTime >= expiration - 300;
+                    }
+
+                    // Function to refresh the token via AJAX
+                    function refreshAccessToken() {
+                        $.ajax({
+                            url: '/api/refresh', // Your server-side endpoint to refresh the token
+                            type: 'POST',
+                            success: function(response) {
+                                // Handle success response from the API if needed
+                                accessToken = response.token;
+                                expirationTime = Math.floor(Date.now() / 1000) + response.expires_in;
+                            },
+                            error: function(error) {
+                                // Handle errors if the API call fails
+                                console.error('Error refreshing token:', error);
+                            }
+                        });
+                    }
+
+                    // Check if the token needs refreshing periodically
+                    setInterval(() => {
+                        if (tokenNeedsRefresh(expirationTime)) {
+                            refreshAccessToken();
+                            console.log('Access token refreshed');
+                        }
+                    }, 60000); // Check every minute
+
+                    const player = new Spotify.Player({
+                        name: 'cafégram',
+                        getOAuthToken: cb => { cb(accessToken); },
+                        volume: 0.5
+                    });
+
+                    // Ready
+                    player.addListener('ready', ({ device_id }) => {
+                        console.log('Ready with Device ID', device_id);
+                        // create button with id=device_id
+                        const button = document.createElement('button');
+                        button.setAttribute('id', device_id);
+                        button.textContent = 'Connect to Spotify';
+                        button.onclick = function() {
+                            // Transfer playback to this device
+                            const endpointURL = `/api/transfer/${device_id}`;
+                            $.ajax({
+                                url: endpointURL,
+                                type: 'PUT', 
+                                success: function(response) {
+                                    // Handle success response from the API if needed
+                                    console.log(response);
+                                },
+                                error: function(error) {
+                                    // Handle errors if the API call fails
+                                    console.error('Error transferring playback:', error);
+                                }
+                            });
+                            
+                        };
+                        document.getElementById('spotify-connect').appendChild(button);
+                    });
+
+                    // Not Ready
+                    player.addListener('not_ready', ({ device_id }) => {
+                        console.log('Device ID has gone offline', device_id);
+                    });
+
+                    player.addListener('initialization_error', ({ message }) => {
+                        console.error(message);
+                    });
+
+                    player.addListener('authentication_error', ({ message }) => {
+                        console.error(message);
+                    });
+
+                    player.addListener('account_error', ({ message }) => {
+                        console.error(message);
+                    });
+
+                    document.getElementById('prevTrack').onclick = function() {
+                    player.previousTrack();
+                    };
+
+                    document.getElementById('togglePlay').onclick = function() {
+                    player.togglePlay();
+                    };
+
+                    document.getElementById('nextTrack').onclick = function() {
+                    player.nextTrack();
+                    };
+
+                    // Update Track everytime it changes
+                    player.addListener('player_state_changed', state => {
+                        track.name = state.track_window.current_track.name;
+                        track.album.images[0].url = state.track_window.current_track.album.images[0].url;
+                        track.artists[0].name = state.track_window.current_track.artists[0].name;
+                        shuffle = state.shuffle;
+                        repeat = state.repeat_mode;
+
+                        // Update button text based on playback state
+                        const isPlaying = !state.paused;
+                        $('#togglePlay').text(isPlaying ? 'Pause' : 'Play');
+                        
+                        // Update track information
+                        $('#track-info').text(state.track_window.current_track.name + ' by ' + state.track_window.current_track.artists[0].name);
+                        $('#album-art').attr('src', state.track_window.current_track.album.images[0].url);
+
+                        // Update shuffle and repeat button styles
+                        if (shuffle) {
+                            $('#shuffle').css('font-weight', 'bold');
+                        } else {
+                            $('#shuffle').css('font-weight', 'normal');
+                        }
+                        
+                        if (repeat === 0) {
+                            $('#repeat').css('font-weight', 'normal');
+                            $('#repeat').css('text-decoration', 'none');
+                        } else if (repeat === 1) {
+                            $('#repeat').css('font-weight', 'bold');
+                            $('#repeat').css('text-decoration', 'none');
+                        } else if (repeat === 2) {
+                            $('#repeat').css('font-weight', 'bold');
+                            $('#repeat').css('text-decoration', 'underline');
+                        }
+
+                        // Toggle track display
+                        toggleTrackDisplay();
+                    });
+
+                    player.connect().then(success => {
+                        if (success) {
+                            console.log('The Web Playback SDK successfully connected to Spotify!');
+                            
+                            // Volume slider change event
+                            $('#volume-slider').on('input', function() {
+                                const volumeValue = $(this).val() / 100; // Normalize volume to a value between 0 and 1
+                                player.setVolume(volumeValue).then(() => {
+                                    console.log('Volume updated');
+                                });
+                            });
+                        }
+                    });
+                }
+            </script>
+            <script>
+                // Toggle shuffle
+                $('#shuffle').on('click', function() {
+                    // Get shuffle font weight
+                    const shuffleFontWeight = $(this).css('font-weight');
+
+                    if (shuffleFontWeight === '700') {
+                        state=false;
+                    } else {
+                        state=true;
+                    }
+
+                    // Construct the URL based on the state
+                    const endpointURL = `/api/shuffle/${state}`;
+
+                    // Make an AJAX request to toggle the shuffle
+                    $.ajax({
+                        url: endpointURL,
+                        type: 'PUT', 
+                        success: function(response) {
+                            // Handle success response from the API if needed
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            // Handle errors if the API call fails
+                            console.error('Error toggling shuffle:', error);
+                        }
+                    });
+                        
+                });
+
+                // Toggle repeat
+                $('#repeat').on('click', function() {
+                    // Get repeat properties
+                    const repeatFontWeight = $(this).css('font-weight');
+                    const repeatTextDecoration = $(this).css('text-decoration');
+
+                    if (repeatFontWeight === '400') {
+                        state='context';
+                    } else if (repeatFontWeight === '700' && repeatTextDecoration.includes('none')) {
+                        state='track';
+                    } else if (repeatFontWeight === '700' && repeatTextDecoration.includes('underline')) {
+                        state='off';
+                    }
+
+                    // Construct the URL based on the state
+                    const endpointURL = `/api/repeat/${state}`;
+
+                    // Make an AJAX request to toggle the repeat
+                    $.ajax({
+                        url: endpointURL,
+                        type: 'PUT', 
+                        success: function(response) {
+                            // Handle success response from the API if needed
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            // Handle errors if the API call fails
+                            console.error('Error toggling repeat:', error);
+                        }
+                    });
+                });
+
+                // Autocomplete search
+                $(document).ready(function() {
+                    $('#search-input').autocomplete({
+                        source: function(request, response) {
+                            // console.log('request: ', request.term)
+                            // console.log('response: ', response)
+
+                            $.getJSON('/api/autocomplete', {
+                                query: request.term,
+                                type: $('#search-type').val()
+                            }, function(data) {
+                                response(data);
+                            });
+                        },
+                        minLength: 2,
+                        select: function(event, ui) {
+                            $(this).val(ui.item.label); 
+                            
+                            // Construct the URL based on the selected item
+                            endpointURL = `/api/play/${$('#search-type').val()}/${ui.item.value}`;
+                            
+                            // Make an AJAX request to play the selected item
+                            $.ajax({
+                                url: endpointURL,
+                                type: 'PUT', 
+                                success: function(response) {
+                                    // Handle success response from the API if needed
+                                    console.log(response);
+                                },
+                                error: function(error) {
+                                    // Handle errors if the API call fails
+                                    console.error('Error playing track:', error);
+                                }
+                            });
+
+                            return false;
+                        }
+                    });
+                });
+
+            </script>
+        {% else %}
+            <div id="spotify-login">
+                <p style="font-weight: bold;">want the webplayer?</p>
+                <button id="login">login to spotify</a>
+            </div>
+            <script>
+                $('#login').on('click', function() {
+                    window.location.href = '{{ url_for("main.login") }}';
+                });
+            </script>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
