@@ -431,3 +431,13 @@ def add_tracks(session, playlist, track_uris):
         return None
     
     return playlist['uri']
+
+'''
+    function: get_tracks
+    --------------------
+    Returns json response from tracks request
+    Returns status code if error occurs
+'''
+def get_tracks(session, time_range='short_term', limit=50):
+    url = 'https://api.spotify.com/v1/me/top/tracks'
+

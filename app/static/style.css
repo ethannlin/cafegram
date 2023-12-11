@@ -105,3 +105,66 @@ video::-webkit-media-controls-timeline {
   text-align: center;
   font-size: 20px;
 }
+
+.form-content{
+  margin: 0px auto;
+  padding-top: 0px;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.form-list{
+  padding: 0px;
+  list-style: none;
+  margin: 0px;
+  position: relative;
+  border: 3px solid #302c2c;
+  border-radius: 15px;
+  background: rgba(239, 239, 239, 0.5);
+}
+
+.form-line{
+  padding: 0px 0px 0px 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.form-header{
+  font-family: 'Circular', sans-serif;
+  text-align: center;
+  border-bottom: 2px solid #302c2c;
+  color: #302c2c!important;
+}
+
+.form-box{
+  padding: 0px;
+}
+
+.form-scroll{
+  overflow-y: scroll;
+  width: 100%;
+  padding: 10px;
+  height: 400px;
+}
+
+.form-submit{
+  text-align: center;
+  width: 100%;
+  padding: 15px 40px 15px 40px;
+  border-top: 2px solid #302c2c;
+}
+
+.form-button{
+  padding: 8px 17px;
+  cursor: pointer;
+  border-radius: 3px 3px;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  margin: 5px;
+}
+
+.iframe-track {
+	position: relative;
+  height: 80px;
+  width: 100%; 
+}

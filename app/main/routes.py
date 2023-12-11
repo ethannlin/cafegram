@@ -1,13 +1,14 @@
 import time
 from app.main import bp
-from flask import jsonify, make_response, render_template, current_app as app, session, redirect, request
+from flask import jsonify, render_template, current_app as app, session, redirect, request
 from app.functions import get_state_key, get_token, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/home', methods=['GET', 'POST'])
 def home():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
-        return render_template('home.html', title='home')
+        session['previous_url'] = '/home'
+        return redirect('/login')
     return render_template('home.html', title='home', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'])
 
 @bp.route('/about')
@@ -22,8 +23,6 @@ def login():
 
     state = get_state_key(16)
     session['state'] = state
-
-    session['previous_url'] = request.referrer
     
     authorize_url = 'https://accounts.spotify.com/authorize?'
     parameters = 'response_type=code&client_id={}&redirect_uri={}&scope={}&state={}'.format(client_id, redirect_uri, scope, state)
@@ -53,10 +52,24 @@ def callback():
 @bp.route('/create')
 def create():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
-        return render_template('create.html', title='create')
+        session['previous_url'] = '/create'
+        return redirect('/login')
     return render_template('create.html', title='create', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'])
 
-# API endpoints
+@bp.route('/discover')
+def discover():
+    if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
+        session['previous_url'] = '/discover'
+        return redirect('/login')
+    track_ids = []
+
+    # TODO: get user's top tracks
+
+    return render_template('discover.html', title='discover', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'], track_ids=track_ids)
+
+'''
+    API Endpoints
+'''
 # toggle shuffle endpoint
 @bp.route('/api/shuffle/<state>', methods=['PUT'])
 def shuffle(state):
@@ -84,6 +97,14 @@ def refresh():
     
     return jsonify({'token' : session['token'], 'expires_in' : session['expires_in']})
 
+# play endpoint
+@bp.route('/api/play/<type>/<uri>', methods=['PUT'])
+def play_results(type, uri):
+    return jsonify(play(session, type, uri))
+
+'''
+    Endpoints for searching and creating playlists
+'''
 # autocomplete endpoint
 @bp.route('/api/autocomplete', methods=['GET'])
 def autocomplete():
@@ -91,11 +112,6 @@ def autocomplete():
     query = request.args.get('query')
     results = search_spotify(session, query, type)
     return jsonify(results)
-
-# play endpoint
-@bp.route('/api/play/<type>/<uri>', methods=['PUT'])
-def play_results(type, uri):
-    return jsonify(play(session, type, uri))
 
 # create playlist endpoint
 @bp.route('/api/create', methods=['POST', 'GET'])

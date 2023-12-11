@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block head %}
+	{{ super() }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row page-info">
+    <div class="col-12 col-lg-4">
+        <h1>top tracks</h1>
+    </div>
+    <div class="col-12 col-lg-8">
+        <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks. we'll keep updating the playlist to match your top tracks.</p>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col-12 col-lg-4">
+        <div class="form-content">
+        <ul class="form-list">
+            <li class="form-header">
+            <h1>last month</h1>
+            </li>
+            <li class="form-line">
+            <div class="form-box">
+                <div class="form-scroll">
+                <div id="short">
+                    {% for track in track_ids[0] %}
+                    <div>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            </li>
+            <li class="form-submit">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+                <p style="margin-top: 10px;">save playlist</p>
+            </button>
+            </li>
+        </ul>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="form-content">
+        <ul class="form-list">
+            <li class="form-header">
+            <h1>6 months</h1>
+            </li>
+            <li class="form-line">
+            <div class="form-box">
+                <div class="form-scroll">
+                <div id="medium">
+                    {% for track in track_ids[1] %}
+                    <div>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            </li>
+            <li class="form-submit">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+                <p style="margin-top: 10px;">save playlist</p>
+            </button>
+            </li>
+        </ul>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="form-content">
+        <ul class="form-list">
+            <li class="form-header">
+            <h1>all-time</h1>
+            </li>
+            <li class="form-line">
+            <div class="form-box">
+                <div class="form-scroll">
+                <div id="long">
+                    {% for track in track_ids[2] %}
+                    <div>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+            </div>
+            </li>
+            <li class="form-submit">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+                <p style="margin-top: 10px;">save playlist</p>
+            </button>
+            </li>
+        </ul>
+        </div>
+    </div>
+    </div>
+    <div id="save-modal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" style="position: absolute; top: 10px; right: 20px;" data-dismiss="modal">&times;</span>
+            <form id="playlist-form">
+                <h1 class="text-center">get your top tracks!</h1>
+                <p style="padding: 10px;">save a spotify playlist with your most played tracks for a select time period.</p>
+                <div class="form-group">
+                    <div class="form-check">
+                        <div class="col-sm-4">
+                            <input type="checkbox" class="form-check-input" name="short_term" id="shortTerm">
+                            <label class="form-check-label" for="shortTerm">last month</label>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-text">
+                                <label for="shortTermName">playlist name</label>
+                                <input type="text" style="margin-bottom: 15px;" class="form-control" name="short_term_name" id="shortTermName" aria-describedby="shortPlaylistName" value="top tracks last month">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <div class="col-sm-4">
+                            <input type="checkbox" class="form-check-input" name="medium_term" id="mediumTerm">
+                            <label class="form-check-label" for="mediumTerm">6 months</label>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-text">
+                                <label for="mediumTermName">playlist name</label>
+                                <input type="text" style="margin-bottom: 15px;" class="form-control" name="medium_term_name" id="mediumTermName" aria-describedby="mediumPlaylistName" value="top tracks 6 months">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <div class="col-sm-4">
+                            <input type="checkbox" class="form-check-input" name="long_term" id="longTerm">
+                            <label class="form-check-label" for="longTerm">all-time</label>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-text">
+                                <label for="longTermName">playlist name</label>
+                                <input type="text" style="margin-bottom: 15px;" class="form-control" name="long_term_name" id="longTermName" aria-describedby="longPlaylistName" value="top tracks all time">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <div class="col-sm-4">
+                            <input type="checkbox" class="form-check-input" name="auto_update" id="autoUpdates">
+                            <label class="form-check-label" for="autoUpdates">automatic updates</label>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-text">
+                                <p>do you wish to have your frequently played playlists automatically synced and updated as your music preferences evolve?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">create playlist</button>  
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
