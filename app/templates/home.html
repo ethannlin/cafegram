@@ -43,20 +43,22 @@
     </div>
     <div class="col-md-4 text-center vertical-center">
         {% if token %}
-            <div id="spotify-connect"></div>
             <div id="spotify-player">
                 <div id="track" style="margin-bottom: 15px;">
                     <h4 id="track-info" style="font-weight: bold;"></h4>
                     <img id="album-art" src=""/>
                 </div>
-                <div class="player-container" style="display: flex; flex-direction: column; align-items: center;">
-                    <input type="range" min="0" max="100" value="50" id="volume-slider" style="margin-bottom: 5px; width: 300px;">
+                <div class="player-container" style="display: flex;  flex-direction: column; align-items: center;">
+                    <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                        <span class="glyphicon glyphicon-volume-down" id="volume" style="margin-right: 5px; color: #302c2c; font-size: 20px;"></span>
+                        <input type="range" min="0" max="100" value="50" id="volume-slider" style="margin-bottom: 5px; width: 250px;">
+                    </div>
                     <div style="display: flex; justify-content: center;">
-                        <button id="shuffle" style="margin-right: 5px;">s</button>
-                        <button id="prevTrack" style="margin-right: 5px;"><<</button>
-                        <button id="togglePlay" style="margin-right: 5px;"></button>
-                        <button id="nextTrack" style="margin-right: 5px;">>></button>
-                        <button id="repeat">r</button>
+                        <button class="btn btn-primary" type="button" id="shuffle" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c">s</button>
+                        <button class="btn btn-primary" type="button" id="prevTrack" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"><span class="glyphicon glyphicon-step-backward"></span></button>
+                        <button class="btn btn-primary" type="button" id="togglePlay" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"></button>
+                        <button class="btn btn-primary" type="button" id="nextTrack" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"><span class="glyphicon glyphicon-step-forward"></span></button>
+                        <button class="btn btn-primary" type="button" id="repeat" style="color: #bfbfbf; background-color: #302c2c">r</button>
                     </div>
                     <div class="search" style="margin-top: 20px;">
                         <h4 style="font-weight: bold; text-align: left;">search</h4>
@@ -146,28 +148,21 @@
                     // Ready
                     player.addListener('ready', ({ device_id }) => {
                         console.log('Ready with Device ID', device_id);
-                        // create button with id=device_id
-                        const button = document.createElement('button');
-                        button.setAttribute('id', device_id);
-                        button.textContent = 'Connect to Spotify';
-                        button.onclick = function() {
-                            // Transfer playback to this device
-                            const endpointURL = `/api/transfer/${device_id}`;
-                            $.ajax({
-                                url: endpointURL,
-                                type: 'PUT', 
-                                success: function(response) {
-                                    // Handle success response from the API if needed
-                                    console.log(response);
-                                },
-                                error: function(error) {
-                                    // Handle errors if the API call fails
-                                    console.error('Error transferring playback:', error);
-                                }
-                            });
-                            
-                        };
-                        document.getElementById('spotify-connect').appendChild(button);
+
+                        // ajax request to transfer playback to web player
+                        const endpointURL = `/api/transfer/${device_id}`;
+                        $.ajax({
+                            url: endpointURL,
+                            type: 'PUT', 
+                            success: function(response) {
+                                // Handle success response from the API if needed
+                                console.log(response);
+                            },
+                            error: function(error) {
+                                // Handle errors if the API call fails
+                                console.error('Error transferring playback:', error);
+                            }
+                        });
                     });
 
                     // Not Ready
@@ -209,7 +204,7 @@
 
                         // Update button text based on playback state
                         const isPlaying = !state.paused;
-                        $('#togglePlay').text(isPlaying ? 'Pause' : 'Play');
+                        $('#togglePlay').html(isPlaying ? '<span class="glyphicon glyphicon-pause"></span>' : '<span class="glyphicon glyphicon-play"></span>');
                         
                         // Update track information
                         $('#track-info').text(state.track_window.current_track.name + ' by ' + state.track_window.current_track.artists[0].name);
@@ -244,6 +239,16 @@
                             // Volume slider change event
                             $('#volume-slider').on('input', function() {
                                 const volumeValue = $(this).val() / 100; // Normalize volume to a value between 0 and 1
+                                if (volumeValue > 0.5) {
+                                    $('#volume').removeClass('glyphicon glyphicon-volume-down');
+                                    $('#volume').addClass('glyphicon glyphicon-volume-up');
+                                } else if (volumeValue <= 0.5 && volumeValue > 0) {
+                                    $('#volume').removeClass('glyphicon glyphicon-volume-up');
+                                    $('#volume').addClass('glyphicon glyphicon-volume-down');
+                                } else if (volumeValue === 0) {
+                                    $('#volume').removeClass('glyphicon glyphicon-volume-down');
+                                    $('#volume').addClass('glyphicon glyphicon-volume-off');
+                                }
                                 player.setVolume(volumeValue).then(() => {
                                     console.log('Volume updated');
                                 });
@@ -358,8 +363,8 @@
             </script>
         {% else %}
             <div id="spotify-login">
-                <p style="font-weight: bold;">want the webplayer?</p>
-                <button id="login">login to spotify</a>
+                <p style="font-weight: bold; color:#302c2c">want the webplayer?</p>
+                <button class="btn btn-primary" type="button" id="login" style="color: #bfbfbf; background-color: #302c2c">login to spotify</a>
             </div>
             <script>
                 $('#login').on('click', function() {

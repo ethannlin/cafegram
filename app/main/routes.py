@@ -1,7 +1,7 @@
 import time
 from app.main import bp
 from flask import jsonify, make_response, render_template, current_app as app, session, redirect, request
-from app.functions import get_state_key, get_token, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play
+from app.functions import get_state_key, get_token, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/home', methods=['GET', 'POST'])
@@ -52,7 +52,9 @@ def callback():
 
 @bp.route('/create')
 def create():
-    return render_template('create.html', title='create')
+    if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
+        return render_template('create.html', title='create')
+    return render_template('create.html', title='create', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'])
 
 # API endpoints
 # toggle shuffle endpoint
@@ -94,3 +96,51 @@ def autocomplete():
 @bp.route('/api/play/<type>/<uri>', methods=['PUT'])
 def play_results(type, uri):
     return jsonify(play(session, type, uri))
+
+# create playlist endpoint
+@bp.route('/api/create', methods=['POST', 'GET'])
+def pcreate():
+    # print(request.form)
+    playlist_name = request.form.get('name')
+
+    seeds = []
+    for i in range(int(request.form.get('seed_count'))):
+        seeds.append(request.form.get(str(i)))
+    
+    tune_params = {}
+    if 'slider_acoustic' in request.form:
+        tune_params['target_acousticness'] = request.form.get('slider_acoustic')
+
+    if 'slider_danceability' in request.form:
+        tune_params['target_danceability'] = request.form.get('slider_danceability')
+    
+    if 'slider_energy' in request.form:
+        tune_params['target_energy'] = request.form.get('slider_energy')
+    
+    if 'slider_instrumental' in request.form:
+        tune_params['target_instrumentalness'] = request.form.get('slider_instrumental')
+
+    if 'slider_lively' in request.form:
+        tune_params['target_liveness'] = request.form.get('slider_lively')
+
+    if 'slider_popularity' in request.form:
+        tune_params['target_popularity'] = request.form.get('slider_popularity')
+    
+    if 'slider_speech' in request.form:
+        tune_params['target_speechiness'] = request.form.get('slider_speech')
+    
+    if 'slider_valence' in request.form:
+        tune_params['target_valence'] = request.form.get('slider_valence')
+    
+    limit = request.form.get('slider_limit')
+    
+    track_recommendations = get_recommendations(session, seeds, tune_params, limit)
+    playlist = create_playlist(session, playlist_name)
+
+    if playlist is None:
+        return 'Error: Could not create playlist.'
+    
+    playlist_uri = add_tracks(session, playlist, track_recommendations)
+
+    return playlist_uri
+    

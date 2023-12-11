@@ -84,3 +84,24 @@ video::-webkit-media-controls-timeline {
   text-decoration: none;
   cursor: pointer;
 }
+
+.slider-value {
+  color: #bfbfbf;
+  text-align: center;
+  border-radius: 3px;
+  background: #302c2c;
+  padding: 2px 10px;
+  margin-left: 5px;
+  margin-top: 0px!important;
+  width: 55px!important;
+  float: left;
+}
+
+.btn-circle {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  text-align: center;
+  font-size: 20px;
+}

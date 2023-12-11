@@ -124,7 +124,7 @@ def get_request(session, url, params={}):
         return get_request(session, url, params)
     else:
         logging.error('get_request:' + str(response.status_code))
-        return response.status_code
+        return response.text
     
 '''
     Function: post_request
@@ -132,21 +132,22 @@ def get_request(session, url, params={}):
     Returns json response from post request
     Returns status code if error occurs
 '''
-def post_request(session, url, params={}):
+def post_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token']
+        'Authorization' : 'Bearer ' + session['token'],
+        'Content-Type' : 'application/json'
     }
 
-    response = requests.post(url, headers=headers, params=params)
+    response = requests.post(url, headers=headers, params=params, data=json.dumps(data))
 
     if response.status_code == 201:
         return response.json()
     
     if response.status_code == 401 and check_token(session):
-        return post_request(session, url, params)
+        return post_request(session, url, params, data=json.dumps(data))
     else:
         logging.error('post_request:' + str(response.status_code))
-        return response.status_code
+        return response.text
     
 '''
     Function: put_request
@@ -154,16 +155,20 @@ def post_request(session, url, params={}):
     Returns json response from put request
     Returns status code if error occurs
 '''
-def put_request(session, url, params={}):
+def put_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token']
+        'Authorization' : 'Bearer ' + session['token'],
+        'Accept': 'application/json', 
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
 
-    response = requests.put(url, headers=headers, params=params)
+    response = requests.put(url, headers=headers, params=params, data=json.dumps(data))
 
     if response.status_code == 204 or response.status_code == 202:
         return response.status_code
     
+    if response.status_code == 401 and check_token(session):
+        return put_request(session, url, params, data=json.dumps(data))
     else:
         logging.error('put_request:' + str(response.status_code))
         return response.text
@@ -174,18 +179,19 @@ def put_request(session, url, params={}):
     Returns json response from delete request
     Returns status code if error occurs
 '''
-def delete_request(session, url, params={}):
+def delete_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token']
-    }
+        'Authorization' : 'Bearer ' + session['token'],
+        'Content-Type' : 'application/json'
+    },
 
-    response = requests.delete(url, headers=headers, params=params)
+    response = requests.delete(url, headers=headers, params=params, data=json.dumps(data))
 
     if response.status_code == 200:
         return response.json()
     
     if response.status_code == 401 and check_token(session):
-        return delete_request(session, url, params)
+        return delete_request(session, url, params, data=json.dumps(data))    
     else:
         logging.error('delete_request:' + str(response.status_code))
         return response.text
@@ -238,17 +244,7 @@ def transfer_playback(session, device_id):
         "device_ids": [device_id]
     }
 
-    response = requests.put(url, headers=headers, data=json.dumps(data))
-
-    if response.status_code == 204 or response.status_code == 202:
-        return response.status_code
-    
-    if response.status_code == 401 and check_token(session):
-        return transfer_playback(session, device_id)
-    else:
-        logging.error('put_request:' + str(response.status_code))
-        return response.text
-    
+    return put_request(session, url, data=data)
 '''
     Function: search_spotify
     ------------------------
@@ -272,12 +268,8 @@ def search_spotify(session, query, type, limit=5):
         }
 
     response = get_request(session, url, params)
-
-    try:
-        if 'error' in response:
-            return None
-    except:
-        return response
+    if 'error' in response:
+        return None
         
     results = []
 
@@ -339,13 +331,103 @@ def play(session, type, uri):
             "context_uri": uri
         }
 
-    response = requests.put(url, headers=headers, data=json.dumps(data))
-
-    if response.status_code == 204 or response.status_code == 202:
-        return response.status_code
+    return put_request(session, url, data=data)
     
-    if response.status_code == 401 and check_token(session):
-        return play(session, type, uri)
-    else:
-        logging.error('put_request:' + str(response.status_code))
-        return response.text
+'''
+    Function: get_recommendations
+    -----------------------------
+    Returns json response from recommendations request
+    Returns status code if error occurs
+'''
+def get_recommendations(session, seeds, tune_params, limit=5):
+    url = 'https://api.spotify.com/v1/recommendations'
+
+    seed_artists = []
+    seed_tracks = []
+    for seed in seeds:
+        if seed[0] == 'a':
+            seed_artists.append(seed[2:])
+        if seed[0] == 't':
+            seed_tracks.append(seed[2:])
+    
+    params = {
+        'seed_artists' : seed_artists,
+        'seed_tracks' : seed_tracks,
+        'limit' : limit
+    }
+
+    params.update(tune_params)
+
+    response = get_request(session, url, params)
+
+    if 'error' in response:
+        return None
+    
+    uris = []
+
+    for track in response['tracks']:
+        uris.append(track['uri'])
+    
+    return uris
+
+'''
+    function: get_user
+    ------------------
+    Returns json response from user request
+    Returns status code if error occurs
+'''
+def get_user(session):
+    url = 'https://api.spotify.com/v1/me'
+
+    response = get_request(session, url)
+
+    if 'error' in response:
+        return None
+    
+    return response
+
+'''
+    function: create_playlist
+    -------------------------
+    Creates playlist
+    Returns status code if error occurs
+'''
+def create_playlist(session, name):
+    user = get_user(session)
+    if user is None:
+        return None
+    
+    url = 'https://api.spotify.com/v1/users/' + user['id'] + '/playlists'
+
+    data = {
+        'name' : name,
+        'description' : 'created by cafégram'
+    }
+
+    response = post_request(session, url, data=data)
+
+    if 'error' in response:
+        return None
+    
+    return response
+    
+'''
+    function: add_tracks
+    --------------------
+    Adds tracks to a given playlist
+    Returns status code if error occurs
+'''
+def add_tracks(session, playlist, track_uris):
+
+    url = 'https://api.spotify.com/v1/playlists/' + playlist['id'] + '/tracks'
+
+    data = {
+        'uris' : track_uris
+    }
+
+    response = post_request(session, url, data=data)
+
+    if 'error' in response:
+        return None
+    
+    return playlist['uri']

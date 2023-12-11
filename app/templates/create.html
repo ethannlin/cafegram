@@ -8,17 +8,17 @@
 
 {% endblock %}
 
-
 {% block content %}
 <div class="container">
     <div class="row page-info">
         <div class="col-12 col-lg-4">
-            <h1>Create Playlist</h1>
+            <h1>create playlist</h1>
         </div>
         <div class="col-12 col-lg-8">
             <p>discover your perfect playlist! share up to 5 of your favorite songs or artists, and we'll curate a personalized playlist just for you. tailor your experience by fine-tuning specific attributes like energy and popularity to craft the ideal mix of tracks that resonate with your taste in music. let's create your musical journey together!</p>
         </div>
     </div>
+    {% if token %}
     <div class="row">
         <div class="col-12">
             <input type="text" id="search-input" placeholder="search for a song or artist" class="form-control input-lg" style="margin-bottom: 20px;"/>
@@ -46,7 +46,7 @@
         <div class="row">
             <div class="col-12" style="padding-left: 20px; padding-right: 20px;">
                 <label for="playlistName">playlist name</label>
-                <input type="text" id="playlist-name" placeholder="enter playlist name" class="form-control">
+                <input type="text" id="playlist-name" placeholder="enter playlist name" class="form-control" value="cafégram recs :)">
             </div>
         </div>
     
@@ -55,8 +55,10 @@
                 <div class="col-sm-4">
                     <label class="form-check-label" for="limitLevel" data-toggle="tooltip" data-placement="right" title="max number of tracks in new playlist">track limit</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_limit" id="sliderLimitRange" class="slider-range custom-range border-0" type="range" min="0" max="100" value="50">
+                <div class="col-sm-6">
+                    <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="100" value="50">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderLimitValue">0</span>
                 </div>
             </div>
@@ -66,90 +68,106 @@
                     <input type="checkbox" class="form-check-input" name="acoustic_level" id="acousticLevel">
                     <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acousticness</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderAcousticValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="danceability_level" id="danceabilityLevel">
                     <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceability</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderDanceabilityValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="energy_level" id="energyLevel">
                     <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energy</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_energy" id="sliderEnergyRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_energy" id="sliderEnergyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderEnergyValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="intrumental_level" id="instrumentalLevel">
                     <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumentalness</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderInstrumentalValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="lively_level" id="livelyLevel">
                     <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">liveliness</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_lively" id="sliderLivelyRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_lively" id="sliderLivelyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderLivelyValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="popularity_level" id="popularityLevel">
                     <label class="form-check-label" for="popularityLevel" data-toggle="tooltip" data-placement="right" title="the popularity of the track. the value will be between 0 and 100, with 100 being the most popular.">popularity</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_popularity" id="sliderPopularityRange" class="slider-range custom-range border-0" type="range" min="0" max="100" value="50">
+                <div class="col-sm-6">
+                    <input name="slider_popularity" id="sliderPopularityRange" class="slider-range" type="range" min="0" max="100" value="50">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderPopularityValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-sm-4">
                     <input type="checkbox" class="form-check-input" name="speech_level" id="speechLevel">
                     <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechiness</label>
                 </div>
-                <div class="col-sm-8">
-                    <input name="slider_speech" id="sliderSpeechRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_speech" id="sliderSpeechRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderSpeechValue">0</span>
                 </div>
             </div>
 
-            <div class="row" style="margin-top: 5px;">
+            <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="valence_level" id="valenceLevel">
                 <label class="form-check-label" for="valenceLevel" data-toggle="tooltip" data-placement="right" title="a measure from 0.0 (sad, depressed, angry) to 1.0 (happy, cheerful, euphoric) describing the musical positiveness conveyed by a track.">valence</label>
             </div>
-                <div class="col-sm-8">
-                    <input name="slider_valence" id="sliderValenceRange" class="slider-range custom-range border-0" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                <div class="col-sm-6">
+                    <input name="slider_valence" id="sliderValenceRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+                </div>
+                <div class="col-sm-2">
                     <span class="slider-value" id="sliderValenceValue">0</span>
                 </div>
             </div>
         </form>
-            <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">Create Playlist</button>   
+            <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">Create Playlist</button>   
         </div>
     </div>
     <script>
@@ -164,23 +182,53 @@
 
             // Iterate through the elements and access their data-id attribute
             var counter = 0;
-            var ids = '';
+            var data = {};
             selectedItems.forEach(item => {
                 const dataId = item.getAttribute('data-id');
-
-                ids += '&' + counter.toString() + '=' + dataId;
-                counter += 1;
+                data[counter] = dataId;
+                counter++;
             });
+            data['seed_count'] = counter;
 
             // Make sure at least one track or artist was entered
             if (counter == 0) {
                 alert('A minimum of one track or artist must be entered to create the playlist.');
             } else {
+                // Get only slider values that are checked
+                const sliders = document.querySelectorAll('.slider-range');
+                sliders.forEach(slider => {
+                    if (slider.disabled == false) {
+                        const sliderName = slider.getAttribute('name');
+                        const sliderValue = slider.value;
+                        data[sliderName] = sliderValue;
+                        counter++;
+
+                        // Reset slider values to default
+                        if (sliderName == 'slider_limit' || sliderName == 'slider_popularity') {
+                            slider.value = 50
+                        } else {
+                            slider.value = 0.5
+                        }
+                    }
+                });
+                
                 // remove all items from the selectedItems div
                 $('#selectedItems').empty();
 
+                data['name'] = $('#playlist-name').val();
                 // make ajax call to create playlist
-                console.log(ids);
+                $.ajax({
+                    url: '/api/create',
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        // console.log(response);
+                        window.location.href = response;
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                })
             }
 
         });
@@ -314,4 +362,11 @@
         };
 
     </script>
+    {% else %}
+    <div class="row">
+        <div class="col-12 text-center">
+            <p style="color: #302c2c; font-weight: bold;">you must be logged in to create a playlist.</p>
+            <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
+        </div>
+    {% endif %}
 {% endblock %}
