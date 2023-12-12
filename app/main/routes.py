@@ -43,6 +43,7 @@ def callback():
         token = get_token(code)
         if token is not None:
             session['token'] = token[0]
+            print(len(token[1]))
             session['refresh_token'] = token[1]
             session['expires_in'] = time.time() + token[2]
         else:

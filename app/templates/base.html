@@ -2,6 +2,8 @@
 
 {% block head %}
     {{ super() }}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="{{url_for('static', filename='cicon.png') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
 {% endblock %}
@@ -41,13 +43,17 @@
 {% endblock %}
 
 {% block content %}
+<div class="wrapper">
     {% block app_content %}
-    {% endblock %}
-    <footer class="text-center">
-        <small>&#9825; 2023–<script>document.write(new Date().getFullYear())</script>
-            <a href="https://github.com/ethannlin">Ethan Lin</a>
+{% endblock %}
+</div>
+<footer class="text-center footer">
+    <div class="container-fluid">
+        <small>
+            created by <a href="https://linktr.ee/ethannlin" target="_blank">ethan lin</a> &#9825;
         </small>
-    </footer>
+    </div>
+</footer>
 {% endblock %}
 
 {% block scripts %}

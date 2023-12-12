@@ -6,7 +6,7 @@
 {% endblock %}
 
 
-{% block content %}
+{% block app_content %}
 <div class="container">
     <div class="row page-info">
         <div class="col-12 col-lg-4">
@@ -160,9 +160,14 @@
                             <input type="checkbox" class="form-check-input" name="auto_update" id="autoUpdates">
                             <label class="form-check-label" for="autoUpdates">automatic updates</label>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <div class="form-text">
                                 <p>do you wish to have your frequently played playlists automatically synced and updated as your music preferences evolve?</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class ="form-text">
+                                <input type="password" style="margin-bottom: 15px;" class="form-control " name="auto_update_code" id="autoUpdateCode" aria-describedby="autoUpdateCode" value="" placeholder="code">
                             </div>
                         </div>
                     </div>

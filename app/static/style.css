@@ -1,6 +1,17 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 body {
     background-color: #ffe8d6;
     font-family: 'Circular', sans-serif;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .navbar-dark {
@@ -167,4 +178,12 @@ video::-webkit-media-controls-timeline {
 	position: relative;
   height: 80px;
   width: 100%; 
+}
+
+footer{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  margin:auto;
 }
