@@ -1,14 +1,13 @@
 import time
 from app.main import bp
 from flask import jsonify, render_template, current_app as app, session, redirect, request
-from app.functions import get_state_key, get_token, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
+from app.functions import get_state_key, get_token, get_tracks, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/home', methods=['GET', 'POST'])
 def home():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
-        session['previous_url'] = '/home'
-        return redirect('/login')
+        return render_template('home.html', title='home')
     return render_template('home.html', title='home', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'])
 
 @bp.route('/about')
@@ -23,6 +22,8 @@ def login():
 
     state = get_state_key(16)
     session['state'] = state
+
+    session['previous_url'] = request.referrer
     
     authorize_url = 'https://accounts.spotify.com/authorize?'
     parameters = 'response_type=code&client_id={}&redirect_uri={}&scope={}&state={}'.format(client_id, redirect_uri, scope, state)
@@ -52,20 +53,70 @@ def callback():
 @bp.route('/create')
 def create():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
-        session['previous_url'] = '/create'
-        return redirect('/login')
+        return render_template('create.html', title='create')
     return render_template('create.html', title='create', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'])
 
 @bp.route('/discover')
 def discover():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
-        session['previous_url'] = '/discover'
-        return redirect('/login')
-    track_ids = []
-
-    # TODO: get user's top tracks
+        return render_template('discover.html', title='discover')
+    
+    track_ids = [[] for i in range(3)]
+    term = ['short_term', 'medium_term', 'long_term']
+    # get user's top tracks
+    for i in range(3):
+        top_tracks = get_tracks(session, term[i], 10)
+        for track in top_tracks['items']:
+            track_ids[i].append(track['id'])
 
     return render_template('discover.html', title='discover', token=session['token'], refresh_token=session['refresh_token'], expires_in=session['expires_in'], track_ids=track_ids)
+
+@bp.route('/discover/create-playlist', methods=['POST'])
+def discover_create():
+    playlist_uri = ''
+    if 'short_term' in request.form:
+        playist_name = request.form.get('short_term_name')
+        playlist = create_playlist(session, playist_name)
+        if playlist is None:
+            return 'Error: Could not create playlist.'
+        
+        tracks = get_tracks(session, 'short_term', 50)
+        track_uris = []
+        for track in tracks['items']:
+            track_uris.append(track['uri'])
+
+        playlist_uri = add_tracks(session, playlist, track_uris)
+
+    if 'medium_term' in request.form:
+        playist_name = request.form.get('medium_term_name')
+        playlist = create_playlist(session, playist_name)
+        if playlist is None:
+            return 'Error: Could not create playlist.'
+
+        tracks = get_tracks(session, 'medium_term', 50)
+        track_uris = []
+        for track in tracks['items']:
+            track_uris.append(track['uri'])
+        
+        playlist_uri = add_tracks(session, playlist, track_uris)
+
+    if 'long_term' in request.form:
+        playist_name = request.form.get('long_term_name')
+        playlist = create_playlist(session, playist_name)
+        if playlist is None:
+            return 'Error: Could not create playlist.'
+        
+        tracks = get_tracks(session, 'long_term', 50)
+        track_uris = []
+        for track in tracks['items']:
+            track_uris.append(track['uri'])
+
+        playlist_uri = add_tracks(session, playlist, track_uris)
+
+    if 'auto_update' in request.form:
+        pass
+
+    return playlist_uri
 
 '''
     API Endpoints

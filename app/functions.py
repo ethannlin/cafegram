@@ -438,6 +438,18 @@ def add_tracks(session, playlist, track_uris):
     Returns json response from tracks request
     Returns status code if error occurs
 '''
-def get_tracks(session, time_range='short_term', limit=50):
+def get_tracks(session, time_range='short_term', limit=10):
     url = 'https://api.spotify.com/v1/me/top/tracks'
+
+    params = {
+        'time_range' : time_range,
+        'limit' : limit
+    }
+
+    response = get_request(session, url, params)
+
+    if 'error' in response:
+        return None
+    
+    return response
 

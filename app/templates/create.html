@@ -59,7 +59,7 @@
                     <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="100" value="50">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderLimitValue">0</span>
+                    <span class="slider-value" id="sliderLimitValue" name="limit_val">0</span>
                 </div>
             </div>
 
@@ -72,7 +72,7 @@
                     <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderAcousticValue">0</span>
+                    <span class="slider-value" id="sliderAcousticValue" name="acoustic_val">0</span>
                 </div>
             </div>
 
@@ -85,7 +85,7 @@
                     <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderDanceabilityValue">0</span>
+                    <span class="slider-value" id="sliderDanceabilityValue" name="danceability_val">0</span>
                 </div>
             </div>
 
@@ -98,7 +98,7 @@
                     <input name="slider_energy" id="sliderEnergyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderEnergyValue">0</span>
+                    <span class="slider-value" id="sliderEnergyValue" name="energy_val">0</span>
                 </div>
             </div>
 
@@ -111,7 +111,7 @@
                     <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderInstrumentalValue">0</span>
+                    <span class="slider-value" id="sliderInstrumentalValue" name="instrumental_val">0</span>
                 </div>
             </div>
 
@@ -124,7 +124,7 @@
                     <input name="slider_lively" id="sliderLivelyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderLivelyValue">0</span>
+                    <span class="slider-value" id="sliderLivelyValue" name="lively_val">0</span>
                 </div>
             </div>
 
@@ -137,7 +137,7 @@
                     <input name="slider_popularity" id="sliderPopularityRange" class="slider-range" type="range" min="0" max="100" value="50">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderPopularityValue">0</span>
+                    <span class="slider-value" id="sliderPopularityValue" name="popularity_val">0</span>
                 </div>
             </div>
 
@@ -150,7 +150,7 @@
                     <input name="slider_speech" id="sliderSpeechRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderSpeechValue">0</span>
+                    <span class="slider-value" id="sliderSpeechValue" name="speech_val">0</span>
                 </div>
             </div>
 
@@ -163,7 +163,7 @@
                     <input name="slider_valence" id="sliderValenceRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
                 </div>
                 <div class="col-sm-2">
-                    <span class="slider-value" id="sliderValenceValue">0</span>
+                    <span class="slider-value" id="sliderValenceValue" name="valence_val">0</span>
                 </div>
             </div>
         </form>
@@ -197,21 +197,40 @@
                 // Get only slider values that are checked
                 const sliders = document.querySelectorAll('.slider-range');
                 sliders.forEach(slider => {
+                    const sliderName = slider.getAttribute('name');
+                    const sliderValue = slider.value;
                     if (slider.disabled == false) {
-                        const sliderName = slider.getAttribute('name');
-                        const sliderValue = slider.value;
                         data[sliderName] = sliderValue;
                         counter++;
-
-                        // Reset slider values to default
-                        if (sliderName == 'slider_limit' || sliderName == 'slider_popularity') {
-                            slider.value = 50
-                        } else {
-                            slider.value = 0.5
-                        }
+                    }
+                    // Reset slider values to default
+                    if (sliderName == 'slider_limit' || sliderName == 'slider_popularity') {
+                        slider.value = 50
+                    } else {
+                        slider.value = 0.5
                     }
                 });
                 
+                // Reset slider values to default
+                const slider_values = document.querySelectorAll('.slider-value');
+                    slider_values.forEach(slider => {
+                        if (slider.getAttribute('name') === 'popularity_val' || slider.getAttribute('name') === 'limit_val') {
+                            slider.innerHTML = 50;
+                        } else {
+                            slider.innerHTML = 0.5;
+                        }
+                });
+
+                // Reset checkbox values to default
+                const checkboxes = document.querySelectorAll('.form-check-input');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.parentNode.nextElementSibling.firstElementChild.disabled = true;
+                });
+
+                // Reset playlist name to default
+                $('#playlist-name').val('cafégram recs :)');
+
                 // remove all items from the selectedItems div
                 $('#selectedItems').empty();
 
@@ -368,5 +387,6 @@
             <p style="color: #302c2c; font-weight: bold;">you must be logged in to create a playlist.</p>
             <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
         </div>
+    </div>
     {% endif %}
 {% endblock %}

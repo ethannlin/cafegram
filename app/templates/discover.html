@@ -9,13 +9,14 @@
 {% block content %}
 <div class="container">
     <div class="row page-info">
-    <div class="col-12 col-lg-4">
-        <h1>top tracks</h1>
+        <div class="col-12 col-lg-4">
+            <h1>top tracks</h1>
+        </div>
+        <div class="col-12 col-lg-8">
+            <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks. we'll keep updating the playlist to match your top tracks.</p>
+        </div>
     </div>
-    <div class="col-12 col-lg-8">
-        <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks. we'll keep updating the playlist to match your top tracks.</p>
-    </div>
-    </div>
+{% if token %}
     <div class="row">
     <div class="col-12 col-lg-4">
         <div class="form-content">
@@ -172,5 +173,30 @@
         </div>
     </div>
 </div>
+<script>
+    $('#createBtn').click(function() {
+        var form = $('#playlist-form');
+        var data = form.serialize();
+        $.ajax({
+            url: '/discover/create-playlist',
+            type: 'POST',
+            data: data,
+            success: function(response) {
+                window.location.href = response;
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+</script>
+{% else %}
+<div class="row">
+    <div class="col-12 text-center">
+        <p style="color: #302c2c; font-weight: bold;">you must be logged in to discover new music.</p>
+        <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}

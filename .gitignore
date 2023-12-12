@@ -10,3 +10,5 @@ app/static/cicon.png
 .DS_Store
 
 __pycache__
+
+notes.txt
