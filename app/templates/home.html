@@ -106,10 +106,10 @@
                 toggleTrackDisplay();
                 
                 window.onSpotifyWebPlaybackSDKReady = () => {
-                    let accessToken = '{{ token }}';
-                    let expirationTime = '{{ expires_in }}';
+                    let accessToken = null;
+                    let expirationTime = null;
 
-                    const tokenRefreshThreshold = 3300; // Threshold in seconds
+                    const tokenRefreshThreshold = 300; // Threshold in seconds
 
                     // Function to refresh the token via AJAX
                     function refreshAccessToken() {
