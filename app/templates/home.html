@@ -54,6 +54,10 @@
                         <span class="glyphicon glyphicon-volume-down" id="volume" style="margin-right: 5px; color: #302c2c; font-size: 20px;"></span>
                         <input type="range" min="0" max="100" value="50" id="volume-slider" style="margin-bottom: 5px; width: 250px;">
                     </div>
+                    <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                        <span class="glyphicon glyphicon-time" id="volume" style="margin-right: 5px; color: #302c2c; font-size: 20px;"></span>
+                        <input type="range" min="0" max="100" step="0.001" value="0" id="postion-slider" style="margin-bottom: 5px; width: 250px;">
+                    </div>
                     <div style="display: flex; justify-content: center;">
                         <button class="btn btn-primary" type="button" id="shuffle" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c">s</button>
                         <button class="btn btn-primary" type="button" id="prevTrack" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"><span class="glyphicon glyphicon-step-backward"></span></button>
@@ -172,6 +176,8 @@
                                 success: function(response) {
                                     // Handle success response from the API if needed
                                     console.log(response);
+                                    $('#spotify-connect').hide();
+                                    $('.player-container').show();
                                 },
                                 error: function(error) {
                                     // Handle errors if the API call fails
@@ -212,13 +218,42 @@
                     player.nextTrack();
                     };
 
+                    // Playback status updates
+                    let track_duration = 0;
+                    function update_track_duration(duration) {
+                        track_duration = duration;
+                        $('#postion-slider').val(0);
+                    }
+
+                    // Add an event listener to handle slider input
+                    $('#postion-slider').on('input', function() {
+                        const position_percent = $(this).val();
+                        const position_ms = position_percent / 100 * track_duration;
+                        player.seek(position_ms);
+                    });
+                    
+                    // Check state every second
+                    setInterval( function() {
+                        player.getCurrentState().then(state => {
+                            if (!state) {
+                                return;
+                            }
+                            const position = state.position;
+                            const duration = state.duration;
+                            const position_percent = position / duration * 100;
+                            $('#postion-slider').val(position_percent);
+                        });
+                    }, 1000)
+
                     // Update Track everytime it changes
                     player.addListener('player_state_changed', state => {
                         track.name = state.track_window.current_track.name;
                         track.album.images[0].url = state.track_window.current_track.album.images[0].url;
                         track.artists[0].name = state.track_window.current_track.artists[0].name;
-                        shuffle = state.shuffle;
-                        repeat = state.repeat_mode;
+
+                        const shuffle = state.shuffle;
+                        const repeat = state.repeat_mode;
+                        const duration = state.duration;
 
                         // Update button text based on playback state
                         const isPlaying = !state.paused;
@@ -244,6 +279,11 @@
                         } else if (repeat === 2) {
                             $('#repeat').css('font-weight', 'bold');
                             $('#repeat').css('text-decoration', 'underline');
+                        }
+
+                        // update position slider
+                        if (duration != track_duration) {
+                            update_track_duration(duration);
                         }
 
                         // Toggle track display
@@ -273,6 +313,10 @@
                             });
                         }
                     });
+
+                    window.onbeforeunload = function() {
+                        player.disconnect();
+                    };
                 }
             </script>
             <script>
