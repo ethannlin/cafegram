@@ -5,9 +5,11 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask_bootstrap import Bootstrap
 from config import Config
+from flask_apscheduler import APScheduler
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
+scheduler = APScheduler()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -15,6 +17,18 @@ def create_app(config_class=Config):
     
     bootstrap.init_app(app)
     db.init_app(app)
+
+    scheduler.init_app(app)
+    # task scheduling
+    from app.models import Users
+    # @scheduler.task('interval', id='update_playlists', seconds=60, misfire_grace_time=900)
+    # # def job1():
+    # #     print('Job 1 executed')
+    @scheduler.task('cron', id='update_playlists', hour='6', day_of_week='mon-sun')
+    def update_playlists_task():
+        with app.app_context():
+            Users.update_playlists()
+    scheduler.start()
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)

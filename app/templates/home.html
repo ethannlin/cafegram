@@ -14,28 +14,28 @@
             <h1 style="font-weight: bold;">cafélib</h1>
         </div>
         <div id="bks">
-            <p style="font-weight: bold;">bakery story</p>
-            <audio class="player" src="/static/audio/bks.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="font-weight: bold;">audio 1</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
         <div id="test2">
-            <p style="margin-top:20px;font-weight: bold;">neko atsume</p>
-            <audio class="player" src="/static/audio/neko_atsume.wav" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="margin-top:20px;font-weight: bold;">audio 2</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
         <div id="test3">
-            <p style="margin-top:20px;font-weight: bold;">hip hop</p>
-            <audio class="player" src="/static/audio/lofi_hiphop.mp3" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="margin-top:20px;font-weight: bold;">audio3</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
         <div id="test4">
-            <p style="margin-top:20px;font-weight: bold;">kpop</p>
-            <audio class="player" src="/static/audio/lofi_kpop.mp3" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="margin-top:20px;font-weight: bold;">audio4</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
         <div id="test5">
-            <p style="margin-top:20px;font-weight: bold;">soothing</p>
-            <audio class="player" src="/static/audio/lofi_asian.mp3" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="margin-top:20px;font-weight: bold;">audio5</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
         <div id="test6">
-            <p style="margin-top:20px;font-weight: bold;">christmas</p>
-            <audio class="player" src="/static/audio/lofi_christmas.mp3" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
+            <p style="margin-top:20px;font-weight: bold;">audio6</p>
+            <audio class="player" src="" controlsList="nodownload noplaybackrate" controls loop type="audio/wav"></audio>
         </div>
     </div>
     <div class="col-md-6">
@@ -106,6 +106,7 @@
                 toggleTrackDisplay();
                 
                 window.onSpotifyWebPlaybackSDKReady = () => {
+                    
                     let accessToken = null;
                     let expirationTime = null;
 
@@ -135,21 +136,22 @@
                     }
 
                     // Function to ensure that the token is always valid before using it
-                    function ensureValidToken() {
+                    function ensureValidToken(cb) {
                         if (tokenNeedsRefresh()) {
                             refreshAccessToken();
                             console.log('Access token refreshed');
                         }
+                        cb(accessToken);
                     }
 
                     const player = new Spotify.Player({
                         name: 'cafégram',
                         getOAuthToken: cb => {
-                            ensureValidToken(); 
-                            cb(accessToken); 
+                            ensureValidToken(cb);
                         },
                         volume: 0.5
                     });
+
 
                     // Ready
                     player.addListener('ready', ({ device_id }) => {

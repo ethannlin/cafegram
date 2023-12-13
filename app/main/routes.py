@@ -85,14 +85,9 @@ def discover():
 
     user = get_user(session)
     if user is None:
-        return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, error='Error: Could not retrieve user.')
-    
-    existing_user = Users.query.filter_by(username=user['id']).first()
-    update = False
-    if existing_user is not None and existing_user.playlist_id_short is not None and existing_user.playlist_id_medium is not None and existing_user.playlist_id_long is not None:
-        update = True
+        return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, error='Error: Could not retrieve user.', code=app.config['AUTO_UPDATE_CODE'])
 
-    return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, update=update)
+    return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, code=app.config['AUTO_UPDATE_CODE'])
 
 @bp.route('/discover/create-playlist', methods=['POST'])
 def discover_create():
@@ -107,11 +102,11 @@ def discover_create():
         playist_name = request.form.get('short_term_name')
         playlist = create_playlist(session, playist_name)
         if playlist is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.', code=app.config['AUTO_UPDATE_CODE'])
         
         tracks = get_tracks(session, 'short_term', 50)
         if tracks is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.', code=app.config['AUTO_UPDATE_CODE'])
         track_uris = []
         for track in tracks['items']:
             track_uris.append(track['uri'])
@@ -122,11 +117,11 @@ def discover_create():
         playist_name = request.form.get('medium_term_name')
         playlist = create_playlist(session, playist_name)
         if playlist is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.', code=app.config['AUTO_UPDATE_CODE'])
         
         tracks = get_tracks(session, 'medium_term', 50)
         if tracks is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.', code=app.config['AUTO_UPDATE_CODE'])
         track_uris = []
         for track in tracks['items']:
             track_uris.append(track['uri'])
@@ -137,86 +132,24 @@ def discover_create():
         playist_name = request.form.get('long_term_name')
         playlist = create_playlist(session, playist_name)
         if playlist is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.', code=app.config['AUTO_UPDATE_CODE'])
         
         tracks = get_tracks(session, 'long_term', 50)
         if tracks is None:
-            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.', code=app.config['AUTO_UPDATE_CODE'])
         track_uris = []
         for track in tracks['items']:
             track_uris.append(track['uri'])
 
         long_term_uri, long_term_id = add_tracks(session, playlist, track_uris)
-
-    user = get_user(session)
-    if user is None:
-        return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not retrieve user.')
     
-    existing_user = Users.query.filter_by(username=user['id']).first()
-    if existing_user is not None:
-        if request.form.get('update') == 'on':
-            if existing_user.playlist_id_short:
-                playlist_track_uris = get_playlist_tracks(session, existing_user.playlist_id_short)
-                if playlist_track_uris is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not retrieve playlist tracks.')
-                delete_playlist(session, existing_user.playlist_id_short, playlist_track_uris)
-
-                tracks = get_tracks(session, 'short_term', 50)
-                if tracks is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
-                track_uris = []
-                for track in tracks['items']:
-                    track_uris.append(track['uri'])
-
-                short_term_playlist = get_playlist(session, existing_user.playlist_id_short)
-                if short_term_playlist is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not update playlist.')
-                
-                add_tracks(session, short_term_playlist, track_uris)
-                short_term_uri = short_term_playlist['uri']
-                
-            if existing_user.playlist_id_medium:
-                playlist_track_uris = get_playlist_tracks(session, existing_user.playlist_id_medium)
-                if playlist_track_uris is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not retrieve playlist tracks.')
-                delete_playlist(session, existing_user.playlist_id_medium, playlist_track_uris)
-
-                tracks = get_tracks(session, 'medium_term', 50)
-                if tracks is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
-                track_uris = []
-                for track in tracks['items']:
-                    track_uris.append(track['uri'])
-
-                medium_term_playlist = get_playlist(session, existing_user.playlist_id_medium)
-                if medium_term_playlist is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not update playlist.')
-
-                add_tracks(session, medium_term_playlist, track_uris)
-                medium_term_uri = medium_term_playlist['uri']
-                
-            if existing_user.playlist_id_long:
-                playlist_track_uris = get_playlist_tracks(session, existing_user.playlist_id_long)
-                if playlist_track_uris is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not retrieve playlist tracks.')
-                delete_playlist(session, existing_user.playlist_id_long, playlist_track_uris)
-
-                tracks = get_tracks(session, 'long_term', 50)
-                if tracks is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
-                track_uris = []
-                for track in tracks['items']:
-                    track_uris.append(track['uri'])
-
-                long_term_playlist = get_playlist(session, existing_user.playlist_id_long)
-                if long_term_playlist is None:
-                    return render_template('discover.html', title='discover', token=session['token'], track_ids=[], update=True, error='Error: Could not update playlist.')
-
-                add_tracks(session, long_term_playlist, track_uris)
-                long_term_uri = long_term_playlist['uri']
-            
-            logging.info('User {} playlists updated.'.format(user['id']))
-        else:
+    if request.form.get('update') == 'on' and request.form.get('update_code') == app.config['AUTO_UPDATE_CODE']:
+        user = get_user(session)
+        if user is None:
+            return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve user.', code=app.config['AUTO_UPDATE_CODE'])
+        
+        existing_user = Users.query.filter_by(username=user['id']).first()
+        if existing_user is not None:
             if short_term_uri:
                 existing_user.playlist_id_short = short_term_id
             if medium_term_uri:
@@ -224,14 +157,12 @@ def discover_create():
             if long_term_uri:
                 existing_user.playlist_id_long = long_term_id
             db.session.commit()
+        else:
+            u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=short_term_id, playlist_id_medium=medium_term_id, playlist_id_long=long_term_id, playlist_id_recs=None)
+            db.session.add(u)
+            db.session.commit()
             
-            logging.info('User {} playlists updated.'.format(user['id']))
-    else:
-        u = Users(username=user['id'], playlist_id_short=short_term_id, playlist_id_medium=medium_term_id, playlist_id_long=long_term_id, playlist_id_recs=None)
-        db.session.add(u)
-        db.session.commit()
-        
-        logging.info('User {} playlists added.'.format(user['id']))
+        logging.info('User {} playlists to be autoupdated.'.format(user['id']))
 
     if short_term_uri:
         return short_term_uri
@@ -308,7 +239,7 @@ def recommendation_playlist():
         if playlist is None:
             return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
         
-        u = Users(username=user['id'], playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None, playlist_id_recs=playlist['id'])
+        u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None, playlist_id_recs=playlist['id'])
         db.session.add(u)
         db.session.commit()
     
