@@ -50,138 +50,138 @@
             </div>
         </div>
     
-        <form id="playlist-form">
-            <div class="row" style="margin-top: 20px;">
-                <div class="col-sm-4">
-                    <label class="form-check-label" for="limitLevel" data-toggle="tooltip" data-placement="right" title="max number of tracks in new playlist">track limit</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="100" value="50">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderLimitValue" name="limit_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 20px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="acoustic_level" id="acousticLevel">
-                    <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acousticness</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderAcousticValue" name="acoustic_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="danceability_level" id="danceabilityLevel">
-                    <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceability</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderDanceabilityValue" name="danceability_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="energy_level" id="energyLevel">
-                    <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energy</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_energy" id="sliderEnergyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderEnergyValue" name="energy_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="intrumental_level" id="instrumentalLevel">
-                    <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumentalness</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderInstrumentalValue" name="instrumental_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="lively_level" id="livelyLevel">
-                    <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">liveliness</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_lively" id="sliderLivelyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderLivelyValue" name="lively_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="popularity_level" id="popularityLevel">
-                    <label class="form-check-label" for="popularityLevel" data-toggle="tooltip" data-placement="right" title="the popularity of the track. the value will be between 0 and 100, with 100 being the most popular.">popularity</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_popularity" id="sliderPopularityRange" class="slider-range" type="range" min="0" max="100" value="50">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderPopularityValue" name="popularity_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="speech_level" id="speechLevel">
-                    <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechiness</label>
-                </div>
-                <div class="col-sm-6">
-                    <input name="slider_speech" id="sliderSpeechRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderSpeechValue" name="speech_val">0</span>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 10px;">
+        <div class="row" style="margin-top: 20px;">
             <div class="col-sm-4">
-                <input type="checkbox" class="form-check-input" name="valence_level" id="valenceLevel">
-                <label class="form-check-label" for="valenceLevel" data-toggle="tooltip" data-placement="right" title="a measure from 0.0 (sad, depressed, angry) to 1.0 (happy, cheerful, euphoric) describing the musical positiveness conveyed by a track.">valence</label>
+                <label class="form-check-label" for="limitLevel" data-toggle="tooltip" data-placement="right" title="max number of tracks in new playlist">track limit</label>
             </div>
-                <div class="col-sm-6">
-                    <input name="slider_valence" id="sliderValenceRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
-                </div>
-                <div class="col-sm-2">
-                    <span class="slider-value" id="sliderValenceValue" name="valence_val">0</span>
-                </div>
+            <div class="col-sm-6">
+                <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="50" value="25">
             </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderLimitValue" name="limit_val">0</span>
+            </div>
+        </div>
 
-            {% if update %}
-            <div class="row" style="margin-top: 10px;">
-                <div class="col-sm-4">
-                    <input type="checkbox" class="form-check-input" name="update" id="updates">
-                    <label class="form-check-label" for="update">update</label>
-                </div>
-                <div class="col-sm-8">
-                    <div class="form-text">
-                        <p>do you want to update your current playlist?</p>
-                    </div>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="acoustic_level" id="acousticLevel">
+                <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acousticness</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderAcousticValue" name="acoustic_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="danceability_level" id="danceabilityLevel">
+                <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceability</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderDanceabilityValue" name="danceability_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="energy_level" id="energyLevel">
+                <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energy</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_energy" id="sliderEnergyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderEnergyValue" name="energy_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="intrumental_level" id="instrumentalLevel">
+                <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumentalness</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderInstrumentalValue" name="instrumental_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="lively_level" id="livelyLevel">
+                <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">liveliness</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_lively" id="sliderLivelyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderLivelyValue" name="lively_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="popularity_level" id="popularityLevel">
+                <label class="form-check-label" for="popularityLevel" data-toggle="tooltip" data-placement="right" title="the popularity of the track. the value will be between 0 and 100, with 100 being the most popular.">popularity</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_popularity" id="sliderPopularityRange" class="slider-range" type="range" min="0" max="100" value="50">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderPopularityValue" name="popularity_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="speech_level" id="speechLevel">
+                <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechiness</label>
+            </div>
+            <div class="col-sm-6">
+                <input name="slider_speech" id="sliderSpeechRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderSpeechValue" name="speech_val">0</span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+        <div class="col-sm-4">
+            <input type="checkbox" class="form-check-input" name="valence_level" id="valenceLevel">
+            <label class="form-check-label" for="valenceLevel" data-toggle="tooltip" data-placement="right" title="a measure from 0.0 (sad, depressed, angry) to 1.0 (happy, cheerful, euphoric) describing the musical positiveness conveyed by a track.">valence</label>
+        </div>
+            <div class="col-sm-6">
+                <input name="slider_valence" id="sliderValenceRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
+            </div>
+            <div class="col-sm-2">
+                <span class="slider-value" id="sliderValenceValue" name="valence_val">0</span>
+            </div>
+        </div>
+
+        {% if update %}
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="update" id="updates">
+                <label class="form-check-label" for="update">update</label>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-text">
+                    <p>do you want to update your current playlist?</p>
                 </div>
             </div>
-            {% endif %}
-        </form>
-            <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>   
+        </div>
+        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create/update playlist</button>   
+        {% else %}
+        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>   
+        {% endif %}
         </div>
     </div>
     <script>
@@ -197,6 +197,8 @@
             // Iterate through the elements and access their data-id attribute
             var counter = 0;
             var data = {};
+            data['update'] = $('#updates').is(':checked');
+
             selectedItems.forEach(item => {
                 const dataId = item.getAttribute('data-id');
                 data[counter] = dataId;
@@ -218,20 +220,24 @@
                         counter++;
                     }
                     // Reset slider values to default
-                    if (sliderName == 'slider_limit' || sliderName == 'slider_popularity') {
-                        slider.value = 50
+                    if (sliderName == 'slider_popularity') {
+                        slider.value = 50;
+                    } else if (sliderName == 'slider_limit') {
+                        slider.value = 25;
                     } else {
-                        slider.value = 0.5
+                        slider.value = 0.5;
                     }
                 });
                 
                 // Reset slider values to default
                 const slider_values = document.querySelectorAll('.slider-value');
                     slider_values.forEach(slider => {
-                        if (slider.getAttribute('name') === 'popularity_val' || slider.getAttribute('name') === 'limit_val') {
+                        if (slider.getAttribute('name') === 'popularity_val') {
                             slider.innerHTML = 50;
+                        } else if (slider.getAttribute('name') === 'limit_val') {
+                            slider.innerHTML = 25;
                         } else {
-                            slider.innerHTML = 0.5;
+                            slider.innerHTML = 0;
                         }
                 });
 
@@ -249,9 +255,10 @@
                 $('#selectedItems').empty();
 
                 data['name'] = $('#playlist-name').val();
+
                 // make ajax call to create playlist
                 $.ajax({
-                    url: '/api/create',
+                    url: '/recommend',
                     type: 'POST',
                     data: data,
                     success: function(response) {

@@ -466,15 +466,6 @@ def get_playlist_tracks(session, playlist_id):
     track_uris = []
     for track in response['items']:
         track_uris.append(track['track']['uri'])
-    
-    if len(track_uris) == 50:
-        params['offset'] = 1
-        response = get_request(session, url, params)
-        if 'error' in response:
-            return None
-        for track in response['items']:
-            track_uris.append(track['track']['uri'])
-    
     return track_uris
 
 '''
@@ -489,7 +480,7 @@ def delete_playlist(session, playlist_id, track_uris):
     tracks =[]
     for track in track_uris:
         tracks.append({'uri' : track})
-
+    
     data = {
         'tracks' : tracks
     }
