@@ -166,6 +166,20 @@
                     <span class="slider-value" id="sliderValenceValue" name="valence_val">0</span>
                 </div>
             </div>
+
+            {% if update %}
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-sm-4">
+                    <input type="checkbox" class="form-check-input" name="update" id="updates">
+                    <label class="form-check-label" for="update">update</label>
+                </div>
+                <div class="col-sm-8">
+                    <div class="form-text">
+                        <p>do you want to update your current playlist?</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </form>
             <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>   
         </div>

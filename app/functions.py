@@ -183,7 +183,7 @@ def delete_request(session, url, params={}, data={}):
     headers = {
         'Authorization' : 'Bearer ' + session['token'],
         'Content-Type' : 'application/json'
-    },
+    }
 
     response = requests.delete(url, headers=headers, params=params, data=json.dumps(data))
 
@@ -234,11 +234,6 @@ def toggle_repeat(session, state):
 '''
 def transfer_playback(session, device_id):
     url = 'https://api.spotify.com/v1/me/player'
-
-    headers = {
-        'Authorization' : 'Bearer ' + session['token'],
-        'Content-Type' : 'application/json'
-    }
 
     data = {
         "device_ids": [device_id]
@@ -430,7 +425,7 @@ def add_tracks(session, playlist, track_uris):
     if 'error' in response:
         return None
     
-    return playlist['uri']
+    return playlist['uri'], playlist['id']
 
 '''
     function: get_tracks
@@ -454,6 +449,71 @@ def get_tracks(session, time_range='short_term', limit=10):
     return response
 
 '''
-    function: 
+    function: get_playlist_tracks
+    -----------------------------
+    Returns json response from playlist tracks request
+    Returns status code if error occurs
 '''
+def get_playlist_tracks(session, playlist_id):
+    url = 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks'
+
+    params = {
+        'limit' : 50,
+    }
+    response = get_request(session, url, params)
+    if 'error' in response:
+        return None
+    track_uris = []
+    for track in response['items']:
+        track_uris.append(track['track']['uri'])
+    
+    if len(track_uris) == 50:
+        params['offset'] = 1
+        response = get_request(session, url, params)
+        if 'error' in response:
+            return None
+        for track in response['items']:
+            track_uris.append(track['track']['uri'])
+    
+    return track_uris
+
+'''
+    function: delete_playlist
+    -------------------------
+    Deletes playlist
+    Returns status code if error occurs
+'''
+def delete_playlist(session, playlist_id, track_uris):
+    url = 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks'
+
+    tracks =[]
+    for track in track_uris:
+        tracks.append({'uri' : track})
+
+    data = {
+        'tracks' : tracks
+    }
+
+    response = delete_request(session, url, data=data)
+
+    if 'error' in response:
+        return None
+    
+    return response
+
+'''
+    function: get_playlist
+    ----------------------
+    Returns json response from playlist request
+    Returns status code if error occurs
+'''
+def get_playlist(session, playlist_id):
+    url = 'https://api.spotify.com/v1/playlists/{playlist_id}'.format(playlist_id=playlist_id)
+    
+    response = get_request(session, url)
+
+    if 'error' in response:
+        return None
+    
+    return response
 

@@ -112,7 +112,7 @@
                     // Function to check if the token needs refreshing
                     function tokenNeedsRefresh(expiration) {
                         const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-                        return currentTime >= expiration - 300;
+                        return currentTime >= expiration - 60;
                     }
 
                     // Function to refresh the token via AJAX
@@ -131,18 +131,16 @@
                             }
                         });
                     }
-
-                    // Check if the token needs refreshing periodically
-                    setInterval(() => {
-                        if (tokenNeedsRefresh(expirationTime)) {
-                            refreshAccessToken();
-                            console.log('Access token refreshed');
-                        }
-                    }, 60000); // Check every minute
-
+                    
                     const player = new Spotify.Player({
                         name: 'cafégram',
-                        getOAuthToken: cb => { cb(accessToken); },
+                        getOAuthToken: cb => { 
+                            if (tokenNeedsRefresh(expirationTime)) {
+                                refreshAccessToken();
+                                console.log('Access token refreshed');
+                            }
+                            cb(accessToken); 
+                        },
                         volume: 0.5
                     });
 

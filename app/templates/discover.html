@@ -13,7 +13,7 @@
             <h1>top tracks</h1>
         </div>
         <div class="col-12 col-lg-8">
-            <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks. we'll keep updating the playlist to match your top tracks.</p>
+            <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks.</p>
         </div>
     </div>
 {% if token %}
@@ -30,7 +30,7 @@
                 <div id="short">
                     {% for track in track_ids[0] %}
                     <div>
-                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameBorder="0" allowfullscreen="" allow="encrypted-media;"></iframe>
                     </div>
                     {% endfor %}
                 </div>
@@ -58,7 +58,7 @@
                 <div id="medium">
                     {% for track in track_ids[1] %}
                     <div>
-                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameBorder="0" allowfullscreen="" allow="encrypted-media;"></iframe>
                     </div>
                     {% endfor %}
                 </div>
@@ -86,7 +86,7 @@
                 <div id="long">
                     {% for track in track_ids[2] %}
                     <div>
-                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+                        <iframe class="iframe-track" src="https://open.spotify.com/embed/track/{{ track }}" frameBorder="0" allowfullscreen="" allow="encrypted-media;"></iframe>
                     </div>
                     {% endfor %}
                 </div>
@@ -153,33 +153,56 @@
                         </div>
                     </div>
                 </div>
-
+                {% if update %}
                 <div class="form-group">
                     <div class="form-check">
                         <div class="col-sm-4">
-                            <input type="checkbox" class="form-check-input" name="auto_update" id="autoUpdates">
-                            <label class="form-check-label" for="autoUpdates">automatic updates</label>
+                            <input type="checkbox" class="form-check-input" name="update" id="updates">
+                            <label class="form-check-label" for="update">update</label>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-8">
                             <div class="form-text">
-                                <p>do you wish to have your frequently played playlists automatically synced and updated as your music preferences evolve?</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class ="form-text">
-                                <input type="password" style="margin-bottom: 15px;" class="form-control " name="auto_update_code" id="autoUpdateCode" aria-describedby="autoUpdateCode" value="" placeholder="code">
+                                <p>do you want to update your current playlists?</p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">create playlist</button>  
+                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">create/update playlist</button>
+                {% else %}
+                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">create playlist</button>
+                {% endif %}  
             </form>
         </div>
     </div>
 </div>
 <script>
+
+    $('#updates').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#shortTerm').prop('disabled', true);
+            $('#mediumTerm').prop('disabled', true);
+            $('#longTerm').prop('disabled', true);
+
+            $('#shortTerm').prop('checked', false);
+            $('#mediumTerm').prop('checked', false);
+            $('#longTerm').prop('checked', false);
+        } else {
+            $('#shortTerm').prop('disabled', false);
+            $('#mediumTerm').prop('disabled', false);
+            $('#longTerm').prop('disabled', false);
+        }
+    });
+
     $('#createBtn').click(function() {
+        check1 = $('#shortTerm').is(':checked');
+        check2 = $('#mediumTerm').is(':checked');
+        check3 = $('#longTerm').is(':checked');
+
+        if (!($('#updates').is(':checked')) && (!check1 && !check2 && !check3)) {
+            alert('Please select at least one time period to create a playlist.');
+            return;
+        }
+
         var form = $('#playlist-form');
         var data = form.serialize();
         $.ajax({
