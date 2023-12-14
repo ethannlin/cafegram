@@ -16,7 +16,14 @@
             <p>we compile your most played tracks over varying periods: the last month, the last six months, and your all-time listening history. with a click, you can create a spotify playlist including these tracks. we'll keep updating the playlist to match your top tracks.</p>
         </div>
     </div>
-{% if token %}
+    {% if error %}
+    <div class="row">
+        <div class="col-12">
+            <p style="color: #302c2c; font-weight: bold;">{{ error }}</p>
+        </div>
+    </div>
+    {% else %}
+    {% if token %}
     <div class="row">
     <div class="col-12 col-lg-4">
         <div class="form-content">
@@ -159,14 +166,9 @@
                             <input type="checkbox" class="form-check-input" name="update" id="updates">
                             <label class="form-check-label" for="updates">automatic updates</label>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-8">
                             <div class="form-text">
                                 <p>do you wish to have your frequently played playlists automatically synced and updated as your music preferences evolve?</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class ="form-text">
-                                <input type="password" style="margin-bottom: 15px;" class="form-control " name="update_code" id="updateCode" aria-describedby="updateCode" value="" placeholder="code">
                             </div>
                         </div>
                     </div>
@@ -179,12 +181,6 @@
 <script>
 
     $('#createBtn').click(function() {
-        var code = '{{ code }}'
-        var update_code = $('#updateCode').val();
-        if (update_code != code) {
-            alert('Invalid code to enable auto updates. Please try again.');
-            return;
-        }
 
         check1 = $('#shortTerm').is(':checked');
         check2 = $('#mediumTerm').is(':checked');
@@ -227,6 +223,7 @@
         <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
     </div>
 </div>
+{% endif %}
 {% endif %}
 
 {% endblock %}

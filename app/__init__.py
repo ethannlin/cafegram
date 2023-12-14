@@ -22,7 +22,6 @@ def create_app():
     app.config['CLIENT_SECRET'] = os.environ.get('CLIENT_SECRET')
     app.config['REDIRECT_URI'] = os.environ.get('REDIRECT_URI')
     app.config['SCOPE'] = os.environ.get('SCOPE')
-    app.config['AUTO_UPDATE_CODE'] = os.environ.get('AUTO_UPDATE_CODE')
     app.config['SCHEDULER_API_ENABLED'] = True
     app.config['LOG_TO_STDOUT'] = os.environ.get('LOG_TO_STDOUT')
     

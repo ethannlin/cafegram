@@ -18,6 +18,13 @@
             <p>discover your perfect playlist! share up to 5 of your favorite songs or artists, and we'll curate a personalized playlist just for you. tailor your experience by fine-tuning specific attributes like energy and popularity to craft the ideal mix of tracks that resonate with your taste in music. let's create your musical journey together!</p>
         </div>
     </div>
+    {% if error %}
+    <div class="row">
+        <div class="col-12">
+            <p style="color: #302c2c; font-weight: bold;">{{ error }}</p>
+        </div>
+    </div>
+    {% else %}
     {% if token %}
     <div class="row">
         <div class="col-12">
@@ -409,5 +416,6 @@
             <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
         </div>
     </div>
+    {% endif %}
     {% endif %}
 {% endblock %}
