@@ -3,7 +3,6 @@ import json
 import random
 import string
 import requests
-import logging
 import time
 from flask import current_app as app, session
 
@@ -47,7 +46,7 @@ def get_token(code):
         json = response.json()
         return json['access_token'], json['refresh_token'], json['expires_in']
     else:
-        logging.error('get_token:' + str(response.status_code))
+        app.logger.error('get_token:' + str(response.status_code))
         return None
     
 '''
@@ -79,7 +78,7 @@ def refresh_token(refresh_token):
         json = response.json()
         return json['access_token'], json['expires_in']
     else:
-        logging.error('refresh_token:' + str(response.status_code))
+        app.logger.error('refresh_token:' + str(response.status_code))
         return None
 
 '''
@@ -95,7 +94,7 @@ def check_token(session):
             session['token'] = token[0]
             session['expires_in'] = time.time() + token[1]
         else:
-            logging.error('check_token_error')
+            app.logger.error('check_token_error')
             return False
 
     return True
@@ -123,7 +122,7 @@ def get_request(session, url, params={}):
     if response.status_code == 401 and check_token(session):
         return get_request(session, url, params)
     else:
-        logging.error('get_request:' + str(response.status_code))
+        app.logger.error('get_request:' + str(response.status_code))
         return response.text
     
 '''
@@ -146,7 +145,7 @@ def post_request(session, url, params={}, data={}):
     if response.status_code == 401 and check_token(session):
         return post_request(session, url, params, data=json.dumps(data))
     else:
-        logging.error('post_request:' + str(response.status_code))
+        app.logger.error('post_request:' + str(response.status_code))
         return response.text
     
 '''
@@ -170,7 +169,7 @@ def put_request(session, url, params={}, data={}):
     if response.status_code == 401 and check_token(session):
         return put_request(session, url, params, data=json.dumps(data))
     else:
-        logging.error('put_request:' + str(response.status_code))
+        app.logger.error('put_request:' + str(response.status_code))
         return response.text
 
 '''
@@ -193,7 +192,7 @@ def delete_request(session, url, params={}, data={}):
     if response.status_code == 401 and check_token(session):
         return delete_request(session, url, params, data=json.dumps(data))    
     else:
-        logging.error('delete_request:' + str(response.status_code))
+        app.logger.error('delete_request:' + str(response.status_code))
         return response.text
     
 '''

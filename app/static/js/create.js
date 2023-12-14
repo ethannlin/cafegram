@@ -61,13 +61,13 @@ $('#createBtn').click(function() {
             checkbox.parentNode.nextElementSibling.firstElementChild.disabled = true;
         });
 
-        // Reset playlist name to default
-        $('#playlist-name').val('cafégram recs :)');
-
         // remove all items from the selectedItems div
         $('#selectedItems').empty();
 
         data['name'] = $('#playlist-name').val();
+
+        // Reset playlist name to default
+        $('#playlist-name').val('cafégram recs :)');
 
         // make ajax call to create playlist
         $.ajax({

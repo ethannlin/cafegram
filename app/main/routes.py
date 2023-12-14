@@ -1,4 +1,3 @@
-import logging
 import time
 from app.main import bp
 from flask import jsonify, render_template, current_app as app, session, redirect, request
@@ -163,13 +162,13 @@ def discover_create():
                     existing_user.playlist_id_medium = medium_term_id
                 if long_term_uri:
                     existing_user.playlist_id_long = long_term_id
-                logging.info('User {} top track playlists updated.'.format(user['id']))
+                app.logger.info('User {} top track playlists updated.'.format(user['id']))
             else:
                 u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=short_term_id, playlist_id_medium=medium_term_id, playlist_id_long=long_term_id, playlist_id_recs=None)
                 db.session.add(u)
-                logging.info('User {} added to the db.'.format(user['id']))
+                app.logger.info('User {} added to the db.'.format(user['id']))
             
-            logging.info('User {} playlists to be autoupdated.'.format(user['id']))
+            app.logger.info('User {} playlists to be autoupdated.'.format(user['id']))
         db.session.commit()
         if short_term_uri:
             return jsonify({'playlist_uri' : short_term_uri }), 200
@@ -241,14 +240,14 @@ def recommendation_playlist():
                 if playlist is None:
                     return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
                 existing_user.playlist_id_recs = playlist['id']
-                logging.info('User {} recommended playlist updated.'.format(user['id']))
+                app.logger.info('User {} recommended playlist updated.'.format(user['id']))
         else:
             playlist = create_playlist(session, playlist_name)
             if playlist is None:
                 return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
             
             u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None, playlist_id_recs=playlist['id'])
-            logging.info('User {} added to the db.'.format(user['id']))
+            app.logger.info('User {} added to the db.'.format(user['id']))
             db.session.add(u)
         db.session.commit()
         
