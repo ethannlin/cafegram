@@ -252,7 +252,7 @@ def recommendation_playlist():
         
         playlist_uri = add_tracks(session, playlist, track_recommendations)
 
-        return jsonify({'playlist_uri' : playlist_uri}), 200
+        return jsonify({'playlist_uri' : playlist_uri[0]}), 200
 
 # toggle shuffle endpoint
 @bp.route('/api/shuffle/<state>', methods=['PUT'])
