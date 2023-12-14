@@ -163,7 +163,7 @@ def put_request(session, url, params={}, data={}):
 
     response = requests.put(url, headers=headers, params=params, data=json.dumps(data))
 
-    if response.status_code == 204 or response.status_code == 202:
+    if response.status_code == 204 or response.status_code == 202 or response.status_code == 200:
         return response.status_code
     
     if response.status_code == 401 and check_token(session):
@@ -263,6 +263,7 @@ def search_spotify(session, query, type, limit=5):
 
     response = get_request(session, url, params)
     if 'error' in response:
+        app.logger.error('search_spotify:' + response)
         return None
         
     results = []
@@ -350,6 +351,7 @@ def get_recommendations(session, seeds, tune_params, limit=5):
     response = get_request(session, url, params)
 
     if 'error' in response:
+        app.logger.error('get_recommendations:' + response)
         return None
     
     uris = []
@@ -371,6 +373,7 @@ def get_user(session):
     response = get_request(session, url)
 
     if 'error' in response:
+        app.logger.error('get_user:' + response)
         return None
     
     return response
@@ -396,6 +399,7 @@ def create_playlist(session, name):
     response = post_request(session, url, data=data)
 
     if 'error' in response:
+        app.logger.error('create_playlist:' + response)
         return None
     
     return response
@@ -417,6 +421,7 @@ def add_tracks(session, playlist, track_uris):
     response = post_request(session, url, data=data)
 
     if 'error' in response:
+        app.logger.error('add_tracks:' + response)
         return None
     
     return playlist['uri'], playlist['id']
@@ -438,6 +443,7 @@ def get_tracks(session, time_range='short_term', limit=10):
     response = get_request(session, url, params)
 
     if 'error' in response:
+        app.logger.error('get_tracks:' + response)
         return None
     
     return response
@@ -456,6 +462,7 @@ def get_playlist_tracks(session, playlist_id):
     }
     response = get_request(session, url, params)
     if 'error' in response:
+        app.logger.error('get_playlist_tracks:' + response)
         return None
     track_uris = []
     for track in response['items']:
@@ -482,6 +489,7 @@ def delete_playlist(session, playlist_id, track_uris):
     response = delete_request(session, url, data=data)
 
     if 'error' in response:
+        app.logger.error('delete_playlist:' + response)
         return None
     
     return response
@@ -498,7 +506,28 @@ def get_playlist(session, playlist_id):
     response = get_request(session, url)
 
     if 'error' in response:
+        app.logger.error('get_playlist:' + response)
         return None
     
     return response
 
+'''
+    update_playlist_name
+    ---------------
+    update playlist name
+    Returns status code if error occurs
+'''
+def update_playlist_name(session, playlist_id, playlist_name):
+    url = 'https://api.spotify.com/v1/playlists/' + playlist_id
+
+    data = {
+        'name' : playlist_name
+    }
+
+    response = put_request(session, url, data=data)
+
+    if response != 200 and response != 202 and response != 204: 
+        app.logger.error('change_playlist_name:' + response)
+        return None
+
+    return response

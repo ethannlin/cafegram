@@ -1,7 +1,7 @@
 import time
 from app.main import bp
 from flask import jsonify, render_template, current_app as app, session, redirect, request
-from app.functions import delete_playlist, get_playlist, get_playlist_tracks, get_state_key, get_token, get_tracks, get_user, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
+from app.functions import delete_playlist, get_playlist, get_playlist_tracks, get_state_key, get_token, get_tracks, get_user, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks, update_playlist_name
 from app.models import Users
 from app import db
 
@@ -234,6 +234,7 @@ def recommendation_playlist():
                 if playlist_tracks is None:
                     return render_template('create.html', title='create', token=session['token'],update=True, error='Error: Could not retrieve playlist tracks.')
                 
+                update_playlist_name(session, existing_user.playlist_id_recs, playlist_name)
                 delete_playlist(session, existing_user.playlist_id_recs, playlist_tracks)
             else:
                 playlist = create_playlist(session, playlist_name)
