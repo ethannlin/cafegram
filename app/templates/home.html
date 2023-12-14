@@ -43,7 +43,6 @@
     </div>
     <div class="col-md-4 text-center vertical-center">
         {% if token %}
-            <div id="spotify-connect"></div>
             <div id="spotify-player">
                 <div id="track" style="margin-bottom: 15px;">
                     <h4 id="track-info" style="font-weight: bold;"></h4>
@@ -90,24 +89,6 @@
                         { name: "" }
                     ]
                 }
-
-                function toggleTrackDisplay() {
-                    const trackInfo = $('#track-info').text();
-                    const albumArtSrc = $('#album-art').attr('src');
-
-                    if (trackInfo !== '' && albumArtSrc !== '') {
-                        // If track information is displayed, hide the text and show the buttons
-                        $('#spotify-connect').hide();
-                        $('.player-container').show();
-                    } else {
-                        // If track information is not fully displayed, show the text and hide the buttons
-                        $('#spotify-connect').show();
-                        $('.player-container').hide();
-                    }
-                }
-
-                // Call the function on initial load
-                toggleTrackDisplay();
                 
                 let accessToken = '{{ token }}';
                 let expirationTime = '{{ expires_in }}';
@@ -160,32 +141,22 @@
                     player.addListener('ready', ({ device_id }) => {
                         console.log('Ready with Device ID', device_id);
 
-                        const button = document.createElement('button');
-                        button.setAttribute('id', device_id);
-                        button.setAttribute('class', 'btn btn-primary');
-                        button.setAttribute('type', 'button');
-                        button.setAttribute('style', 'color: #bfbfbf; background-color: #302c2c');
-                        button.textContent = 'Connect to Spotify';
-                        button.onclick = function() {
-                            // Transfer playback to this device
-                            const endpointURL = `/api/transfer/${device_id}`;
-                            $.ajax({
-                                url: endpointURL,
-                                type: 'PUT', 
-                                success: function(response) {
-                                    // Handle success response from the API if needed
-                                    console.log(response);
-                                    $('#spotify-connect').hide();
-                                    $('.player-container').show();
-                                },
-                                error: function(error) {
-                                    // Handle errors if the API call fails
-                                    console.error('Error transferring playback:', error);
-                                }
-                            });
-                            
-                        };
-                        document.getElementById('spotify-connect').appendChild(button);
+                        // transfer playback 
+                        const endpointURL = `/api/transfer/${device_id}`;
+                        $.ajax({
+                            url: endpointURL,
+                            type: 'PUT', 
+                            success: function(response) {
+                                // Handle success response from the API if needed
+                                console.log(response);
+                                $('#spotify-connect').hide();
+                                $('.player-container').show();
+                            },
+                            error: function(error) {
+                                // Handle errors if the API call fails
+                                console.error('Error transferring playback:', error);
+                            }
+                        });
                     });
 
                     // Not Ready
@@ -284,9 +255,6 @@
                         if (duration != track_duration) {
                             update_track_duration(duration);
                         }
-
-                        // Toggle track display
-                        toggleTrackDisplay();
                     });
 
                     player.connect().then(success => {
