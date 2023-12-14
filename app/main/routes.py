@@ -91,6 +91,10 @@ def discover():
 
     return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids)
 
+'''
+    API Endpoints
+'''
+# discover tab create playlist endpoint
 @bp.route('/discover/create-playlist', methods=['POST'])
 def discover_create():
     with app.app_context():
@@ -168,13 +172,13 @@ def discover_create():
             logging.info('User {} playlists to be autoupdated.'.format(user['id']))
 
         if short_term_uri:
-            return jsonify({'playlist_uri' : short_term_uri })
+            return jsonify({'playlist_uri' : short_term_uri }), 200
         elif medium_term_uri:
-            return jsonify({'playlist_uri' : medium_term_uri })
+            return jsonify({'playlist_uri' : medium_term_uri }), 200
         elif long_term_uri:
-            return jsonify({'playlist_uri' : long_term_uri })
+            return jsonify({'playlist_uri' : long_term_uri }), 200
 
-# create playlist endpoint
+# create tab create playlist endpoint
 @bp.route('/recommend', methods=['POST', 'GET'])
 def recommendation_playlist():
     with app.app_context():
@@ -248,25 +252,22 @@ def recommendation_playlist():
         
         playlist_uri = add_tracks(session, playlist, track_recommendations)
 
-        return jsonify({'playlist_uri' : playlist_uri})
+        return jsonify({'playlist_uri' : playlist_uri}), 200
 
-'''
-    API Endpoints
-'''
 # toggle shuffle endpoint
 @bp.route('/api/shuffle/<state>', methods=['PUT'])
 def shuffle(state):
-    return jsonify(toggle_shuffle(session, state))
+    return jsonify(toggle_shuffle(session, state)), 200
 
 # toggle repeat endpoint
 @bp.route('/api/repeat/<state>', methods=['PUT'])
 def repeat(state):
-    return jsonify(toggle_repeat(session, state))
+    return jsonify(toggle_repeat(session, state)), 200
 
 # transfer playback endpoint
 @bp.route('/api/transfer/<device_id>', methods=['PUT'])
 def transfer(device_id):
-    return jsonify(transfer_playback(session, device_id))
+    return jsonify(transfer_playback(session, device_id)), 200
 
 # refresh token endpoint
 @bp.route('/api/refresh', methods=['POST'])
@@ -278,12 +279,12 @@ def refresh():
     else:
         return render_template('home.html', title='home', error='Error: Could not retrieve access token.')
     
-    return jsonify({'token' : session['token'], 'expires_in' : session['expires_in']})
+    return jsonify({'token' : session['token'], 'expires_in' : session['expires_in']}), 200
 
 # play endpoint
 @bp.route('/api/play/<type>/<uri>', methods=['PUT'])
 def play_results(type, uri):
-    return jsonify(play(session, type, uri))
+    return jsonify(play(session, type, uri)), 200
 
 '''
     Endpoints for searching and creating playlists
@@ -294,4 +295,4 @@ def autocomplete():
     type = request.args.get('type')
     query = request.args.get('query')
     results = search_spotify(session, query, type)
-    return jsonify(results)
+    return jsonify(results), 200
