@@ -12,7 +12,7 @@ class Config(object):
     REDIRECT_URI = os.environ.get('REDIRECT_URI')
     SCOPE = os.environ.get('SCOPE')
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SCHEDULER_API_ENABLED = True

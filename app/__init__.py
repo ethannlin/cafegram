@@ -6,6 +6,7 @@ from logging.handlers import RotatingFileHandler
 from flask_bootstrap import Bootstrap
 from config import Config
 from flask_apscheduler import APScheduler
+import pytz
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -24,7 +25,7 @@ def create_app(config_class=Config):
     # @scheduler.task('interval', id='update_playlists', seconds=60, misfire_grace_time=900)
     # # def job1():
     # #     print('Job 1 executed')
-    @scheduler.task('cron', id='update_playlists', hour='6', day_of_week='mon-sun')
+    @scheduler.task('cron', id='update_playlists', hour='6', day_of_week='mon-sun', timezone=pytz.timezone('US/Pacific'))
     def update_playlists_task():
         with app.app_context():
             Users.update_playlists()
