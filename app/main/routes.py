@@ -11,7 +11,7 @@ from app import db
 def home():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
         return render_template('home.html', title='home')
-    return render_template('home.html', title='home', token=session['token'])
+    return render_template('home.html', title='home', token=session['token'], expires_in=session['expires_in'])
 
 @bp.route('/about')
 def about():

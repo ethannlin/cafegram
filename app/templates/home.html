@@ -109,45 +109,44 @@
                 // Call the function on initial load
                 toggleTrackDisplay();
                 
-                window.onSpotifyWebPlaybackSDKReady = () => {
-                    
-                    let accessToken = null;
-                    let expirationTime = null;
+                let accessToken = '{{ token }}';
+                let expirationTime = '{{ expires_in }}';
 
-                    const tokenRefreshThreshold = 300; // Threshold in seconds
+                const tokenRefreshThreshold = 300; // Threshold in seconds
 
-                    // Function to refresh the token via AJAX
-                    function refreshAccessToken() {
-                        $.ajax({
-                            url: '/api/refresh', // Your server-side endpoint to refresh the token
-                            type: 'POST',
-                            success: function(response) {
-                                // Handle success response from the API if needed
-                                accessToken = response['token'];
-                                expirationTime = Math.floor(Date.now() / 1000) + response['expires_in'];
-                            },
-                            error: function(error) {
-                                // Handle errors if the API call fails
-                                console.error('Error refreshing token:', error);
-                            }
-                        });
-                    }
-
-                    // Function to check if the token is expired or needs refreshing
-                    function tokenNeedsRefresh() {
-                        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-                        return !expirationTime || currentTime >= expirationTime - tokenRefreshThreshold;
-                    }
-
-                    // Function to ensure that the token is always valid before using it
-                    function ensureValidToken(cb) {
-                        if (tokenNeedsRefresh()) {
-                            refreshAccessToken();
-                            console.log('Access token refreshed');
+                // Function to refresh the token via AJAX
+                function refreshAccessToken() {
+                    $.ajax({
+                        url: '/api/refresh', // Your server-side endpoint to refresh the token
+                        type: 'POST',
+                        success: function(response) {
+                            // Handle success response from the API if needed
+                            accessToken = response['token'];
+                            expirationTime = Math.floor(Date.now() / 1000) + response['expires_in'];
+                        },
+                        error: function(error) {
+                            // Handle errors if the API call fails
+                            console.error('Error refreshing token:', error);
                         }
-                        cb(accessToken);
-                    }
+                    });
+                }
 
+                // Function to check if the token is expired or needs refreshing
+                function tokenNeedsRefresh() {
+                    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+                    return !expirationTime || currentTime >= expirationTime - tokenRefreshThreshold;
+                }
+
+                // Function to ensure that the token is always valid before using it
+                function ensureValidToken(cb) {
+                    if (tokenNeedsRefresh()) {
+                        refreshAccessToken();
+                        console.log('Access token refreshed');
+                    }
+                    cb(accessToken);
+                }
+
+                window.onSpotifyWebPlaybackSDKReady = () => {
                     const player = new Spotify.Player({
                         name: 'cafégram',
                         getOAuthToken: cb => {

@@ -31,6 +31,7 @@ def get_token(code):
 
     headers = {
         'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
+        'Accept' : 'application/json',
         'Content-Type' : 'application/x-www-form-urlencoded'
         }
     
@@ -64,6 +65,7 @@ def refresh_token(refresh_token):
 
     headers = {
         'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
+        'Accept' : 'application/json',
         'Content-Type' : 'application/x-www-form-urlencoded'
     }
     
@@ -135,6 +137,7 @@ def get_request(session, url, params={}):
 def post_request(session, url, params={}, data={}):
     headers = {
         'Authorization' : 'Bearer ' + session['token'],
+        'Accept' : 'application/json',
         'Content-Type' : 'application/json'
     }
 
@@ -182,6 +185,7 @@ def put_request(session, url, params={}, data={}):
 def delete_request(session, url, params={}, data={}):
     headers = {
         'Authorization' : 'Bearer ' + session['token'],
+        'Accept' : 'application/json',
         'Content-Type' : 'application/json'
     }
 
@@ -311,11 +315,6 @@ def search_spotify(session, query, type, limit=5):
 '''
 def play(session, type, uri):
     url = 'https://api.spotify.com/v1/me/player/play'
-
-    headers = {
-        'Authorization' : 'Bearer ' + session['token'],
-        'Content-Type' : 'application/json'
-    }
 
     if type == 'track':
         data = {
