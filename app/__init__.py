@@ -4,16 +4,27 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from flask_bootstrap import Bootstrap
-from config import Config
+# from config import Config
 from flask_apscheduler import APScheduler
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 scheduler = APScheduler()
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    # app.config.from_object(config_class)
+
+    # Heroku environment variables
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    app.config['CLIENT_ID'] = os.environ.get('CLIENT_ID')
+    app.config['CLIENT_SECRET'] = os.environ.get('CLIENT_SECRET')
+    app.config['REDIRECT_URI'] = os.environ.get('REDIRECT_URI')
+    app.config['SCOPE'] = os.environ.get('SCOPE')
+    app.config['AUTO_UPDATE_CODE'] = os.environ.get('AUTO_UPDATE_CODE')
+    app.config['SCHEDULER_API_ENABLED'] = True
+    app.config['LOG_TO_STDOUT'] = os.environ.get('LOG_TO_STDOUT')
     
     bootstrap.init_app(app)
     db.init_app(app)
