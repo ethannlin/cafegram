@@ -300,7 +300,7 @@ def autocomplete():
     return jsonify(results), 200
 
 # update playlist endpoint for manual playlist updates
-@bp.route('/api/update-playlist', methods=['POST'])
+@bp.route('/api/update-playlists', methods=['POST'])
 def update():
     with app.app_context():
         Users.update_playlists()
