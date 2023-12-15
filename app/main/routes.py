@@ -298,3 +298,11 @@ def autocomplete():
     query = request.args.get('query')
     results = search_spotify(session, query, type)
     return jsonify(results), 200
+
+# update playlist endpoint for manual playlist updates
+@bp.route('/api/update-playlist', methods=['POST'])
+def update():
+    with app.app_context():
+        Users.update_playlists()
+
+    return jsonify({'message': 'Playlist update triggered successfully'}), 200

@@ -1,5 +1,3 @@
-import logging
-
 from app import db
 from app.functions import add_tracks, delete_playlist, get_playlist, get_playlist_tracks, get_tracks, refresh_token
 from flask import current_app as app
@@ -37,55 +35,27 @@ class Users(db.Model):
 
             session = {'token': token, 'refresh_token': user.refresh_token, 'expires_in': expires_in}
 
-            if user.playlist_id_short:
-                playlist_track_uris = get_playlist_tracks(session, user.playlist_id_short)
-                if playlist_track_uris is not None:
-                    delete_playlist(session, user.playlist_id_short, playlist_track_uris)
-                    tracks = get_tracks(session, 'short_term', 50)
-                    track_uris = []
-                    for track in tracks['items']:
-                        track_uris.append(track['uri'])
+            def fetch_and_add_tracks(duration, playlist_attr):
+                nonlocal updated
+                playlist_id = getattr(user, playlist_attr)
+                if playlist_id:
+                    playlist_track_uris = get_playlist_tracks(session, playlist_id)
+                    if playlist_track_uris is not None:
+                        delete_playlist(session, playlist_id, playlist_track_uris)
+                        tracks = get_tracks(session, duration, 50)
+                        track_uris = [track['uri'] for track in tracks['items']]
+                        playlist = get_playlist(session, playlist_id)
+                        add_tracks(session, playlist, track_uris)
+                        updated = True
+                    else:
+                        setattr(user, playlist_attr, None)
 
-                    short_term_playlist = get_playlist(session, user.playlist_id_short)
-                    add_tracks(session, short_term_playlist, track_uris)
-                    updated = True
-                else:
-                    user.playlist_id_short = None
-                
-            if user.playlist_id_medium:
-                playlist_track_uris = get_playlist_tracks(session, user.playlist_id_medium)
-                if playlist_track_uris is not None:
-                    delete_playlist(session, user.playlist_id_medium, playlist_track_uris)
-                    tracks = get_tracks(session, 'medium_term', 50)
-                    track_uris = []
-                    for track in tracks['items']:
-                        track_uris.append(track['uri'])
+            fetch_and_add_tracks('short_term', 'playlist_id_short')
+            fetch_and_add_tracks('medium_term', 'playlist_id_medium')
+            fetch_and_add_tracks('long_term', 'playlist_id_long')
 
-                    medium_term_playlist = get_playlist(session, user.playlist_id_medium)
-                    add_tracks(session, medium_term_playlist, track_uris)
-                    updated = True
-                else:
-                    user.playlist_id_medium = None
-                
-            if user.playlist_id_long:
-                playlist_track_uris = get_playlist_tracks(session, user.playlist_id_long)
-                if playlist_track_uris is not None:
-                    delete_playlist(session, user.playlist_id_long, playlist_track_uris)
-
-                    tracks = get_tracks(session, 'long_term', 50)
-                    track_uris = []
-                    for track in tracks['items']:
-                        track_uris.append(track['uri'])
-
-                    long_term_playlist = get_playlist(session, user.playlist_id_long)
-                    add_tracks(session, long_term_playlist, track_uris)
-                    updated = True
-            else:
-                user.playlist_id_long = None
-            
             if not updated:
                 db.session.delete(user)
-        
+
         db.session.commit()
-            
         app.logger.info('Updated all user playlists.')

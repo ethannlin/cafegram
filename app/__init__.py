@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy as _BaseSQLAlchemy
 import os
 import logging
 from logging.handlers import RotatingFileHandler
@@ -8,8 +8,13 @@ from config import Config
 from flask_apscheduler import APScheduler
 import pytz
 
-bootstrap = Bootstrap()
+class SQLAlchemy(_BaseSQLAlchemy):
+    def apply_pool_defaults(self, app, options):
+        super(SQLAlchemy, self).apply_pool_defaults(self, app, options)
+        options["pool_pre_ping"] = True
+
 db = SQLAlchemy()
+bootstrap = Bootstrap()
 scheduler = APScheduler()
 
 def create_app(config_class=Config):
@@ -22,9 +27,6 @@ def create_app(config_class=Config):
     scheduler.init_app(app)
     # task scheduling
     from app.models import Users
-    # @scheduler.task('interval', id='update_playlists', seconds=60, misfire_grace_time=900)
-    # # def job1():
-    # #     print('Job 1 executed')
     @scheduler.task('cron', id='update_playlists', hour='6', day_of_week='mon-sun', timezone=pytz.timezone('US/Pacific'))
     def update_playlists_task():
         with app.app_context():
