@@ -45,7 +45,6 @@ def callback():
         token = get_token(code)
         if token is not None:
             session['token'] = token[0]
-            print(len(token[1]))
             session['refresh_token'] = token[1]
             session['expires_in'] = time.time() + token[2]
         else:
@@ -277,11 +276,12 @@ def refresh():
     token = refresh_token(session['refresh_token'])
     if token is not None:
         session['token'] = token[0]
-        session['expires_in'] = time.time() + token[1]
+        session['refresh_token'] = token[1]
+        session['expires_in'] = time.time() + token[2]
     else:
         return render_template('home.html', title='home', error='Error: Could not retrieve access token.')
     
-    return jsonify({'token' : session['token'], 'expires_in' : session['expires_in']}), 200
+    return jsonify({'token' : session['token'], 'refresh_token' : session['refresh_token'], 'expires_in' : session['expires_in']}), 200
 
 # play endpoint
 @bp.route('/api/play/<type>/<uri>', methods=['PUT'])

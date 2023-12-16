@@ -1,3 +1,4 @@
+import time
 from app import db
 from app.functions import add_tracks, delete_playlist, get_playlist, get_playlist_tracks, get_tracks, refresh_token
 from flask import current_app as app
@@ -28,10 +29,13 @@ class Users(db.Model):
         for user in users:
             updated = False
 
-            token, expires_in = refresh_token(user.refresh_token)
+            token, refresh_token, expires_in = refresh_token(user.refresh_token)
             if token is None:
                 db.session.delete(user)
+                app.logger.info('Deleted user {}. Token unable to be updated.'.format(user.username))
                 continue
+            else:
+                user.refresh_token = refresh_token
 
             session = {'token': token, 'refresh_token': user.refresh_token, 'expires_in': expires_in}
 
@@ -47,8 +51,10 @@ class Users(db.Model):
                         playlist = get_playlist(session, playlist_id)
                         add_tracks(session, playlist, track_uris)
                         updated = True
+                        app.logger.info('Updated playlist {} for user {}.'.format(playlist_attr, user.username))
                     else:
                         setattr(user, playlist_attr, None)
+                        app.logger('Deleted playlist {} for user {}. Unable to get playlist tracks.'.format(playlist_attr, user.username))
 
             fetch_and_add_tracks('short_term', 'playlist_id_short')
             fetch_and_add_tracks('medium_term', 'playlist_id_medium')
@@ -56,6 +62,7 @@ class Users(db.Model):
 
             if not updated:
                 db.session.delete(user)
+                app.logger.info('Deleted user {}. No playlists able to be updated.'.format(user.username))
 
         db.session.commit()
         app.logger.info('Updated all user playlists.')
