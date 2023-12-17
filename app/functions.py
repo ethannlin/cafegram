@@ -55,7 +55,7 @@ def get_token(code):
     Returns new access token, refresh token, and expiration time in seconds
     Returns None if error occurs
 '''
-def refresh_token(refresh_token):
+def refresh_token(token):
     client_id = app.config['CLIENT_ID']
     client_secret = app.config['CLIENT_SECRET']
 
@@ -68,7 +68,7 @@ def refresh_token(refresh_token):
     
     body = {
         'grant_type' : 'refresh_token',
-        'refresh_token' : refresh_token
+        'refresh_token' : token
     }
 
     response = requests.post(token_url, headers=headers, data=body)
@@ -76,7 +76,10 @@ def refresh_token(refresh_token):
     # 200 code indicates access token was properly granted
     if response.status_code == 200:
         json = response.json()
-        return json['access_token'], json['refresh_token'], json['expires_in']
+        new_refresh_token = json.get('refresh_token')
+        if new_refresh_token is None:
+            new_refresh_token = token
+        return json['access_token'], new_refresh_token, json['expires_in']
     else:
         app.logger.error('refresh_token:' + str(response.status_code))
         return None
