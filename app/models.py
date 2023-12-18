@@ -1,3 +1,4 @@
+import time
 from app import db
 from app.functions import add_tracks, delete_playlist, get_playlist, get_playlist_tracks, get_tracks, refresh_token
 from flask import current_app as app
@@ -24,44 +25,57 @@ class Users(db.Model):
     @staticmethod
     def update_playlists():
         users = Users.query.all()
+        max_tries = 5
+        retry_delay = 2
 
-        for user in users:
-            updated = False
+        def fetch_and_add_tracks(duration, playlist_attr):
+            nonlocal updated
+            playlist_id = getattr(user, playlist_attr)
+            if playlist_id:
+                playlist_track_uris = get_playlist_tracks(session, playlist_id)
+                if playlist_track_uris is not None:
+                    delete_playlist(session, playlist_id, playlist_track_uris)
+                    tracks = get_tracks(session, duration, 50)
+                    track_uris = [track['uri'] for track in tracks['items']]
+                    playlist = get_playlist(session, playlist_id)
+                    test = add_tracks(session, playlist, track_uris)
+                    updated = True
+                    app.logger.info('Updated playlist {} for user {}.'.format(playlist_attr, user.username))
+                else:
+                    setattr(user, playlist_attr, None)
+                    app.logger.warning('Deleted playlist {} for user {}. Unable to get playlist tracks.'.format(playlist_attr, user.username))
 
-            token, refresh, expires_in = refresh_token(user.refresh_token)
-            if token is None:
-                db.session.delete(user)
-                app.logger.info('Deleted user {}. Token unable to be updated.'.format(user.username))
-                continue
-            else:
-                user.refresh_token = refresh
+        for i in range(max_tries):
+            try:
+                for user in users:
+                    updated = False
 
-            session = {'token': token, 'refresh_token': user.refresh_token, 'expires_in': expires_in}
-
-            def fetch_and_add_tracks(duration, playlist_attr):
-                nonlocal updated
-                playlist_id = getattr(user, playlist_attr)
-                if playlist_id:
-                    playlist_track_uris = get_playlist_tracks(session, playlist_id)
-                    if playlist_track_uris is not None:
-                        delete_playlist(session, playlist_id, playlist_track_uris)
-                        tracks = get_tracks(session, duration, 50)
-                        track_uris = [track['uri'] for track in tracks['items']]
-                        playlist = get_playlist(session, playlist_id)
-                        test = add_tracks(session, playlist, track_uris)
-                        updated = True
-                        app.logger.info('Updated playlist {} for user {}.'.format(playlist_attr, user.username))
+                    token, refresh, expires_in = refresh_token(user.refresh_token)
+                    if token is None:
+                        db.session.delete(user)
+                        app.logger.warning('Deleted user {}. Token unable to be updated.'.format(user.username))
+                        continue
                     else:
-                        setattr(user, playlist_attr, None)
-                        app.logger('Deleted playlist {} for user {}. Unable to get playlist tracks.'.format(playlist_attr, user.username))
+                        user.refresh_token = refresh
 
-            fetch_and_add_tracks('short_term', 'playlist_id_short')
-            fetch_and_add_tracks('medium_term', 'playlist_id_medium')
-            fetch_and_add_tracks('long_term', 'playlist_id_long')
+                    session = {'token': token, 'refresh_token': user.refresh_token, 'expires_in': expires_in}
 
-            if not updated:
-                db.session.delete(user)
-                app.logger.info('Deleted user {}. No playlists able to be updated.'.format(user.username))
+                    fetch_and_add_tracks('short_term', 'playlist_id_short')
+                    fetch_and_add_tracks('medium_term', 'playlist_id_medium')
+                    fetch_and_add_tracks('long_term', 'playlist_id_long')
 
-        db.session.commit()
-        app.logger.info('Updated all user playlists.')
+                    if not updated:
+                        db.session.delete(user)
+                        app.logger.warning('Deleted user {}. No playlists able to be updated.'.format(user.username))
+
+                db.session.commit()
+                app.logger.info('Updated all user playlists.')
+                break;
+            except Exception as e:
+                app.logger.warning('Error updating user playlists: {}'.format(str(e)))
+                if i < max_tries-1:
+                    delay = retry_delay * (2**i)
+                    app.logger.warning('Retrying in {} seconds.'.format(delay))
+                    time.sleep(delay)
+                else:
+                    app.logger.warning('Max retries reached. Some playlists may not be updated.')
