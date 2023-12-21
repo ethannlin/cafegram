@@ -114,7 +114,8 @@ def check_token(session):
 '''
 def get_request(session, url, params={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token']
+        "Authorization" : "Bearer " + session['token'],
+        "Accept": "application/json",
     }
 
     response = requests.get(url, headers=headers, params=params)
@@ -136,17 +137,19 @@ def get_request(session, url, params={}):
 '''
 def post_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token'],
-        'Content-Type' : 'application/json'
+        "Authorization" : "Bearer " + session['token'],
+        "Accept" : "application/json",
+        "Content-Type" : "application/json"
     }
 
-    response = requests.post(url, headers=headers, params=params, data=json.dumps(data))
+    serialized_data = json.dumps(data)
+    response = requests.post(url, headers=headers, params=params, data=serialized_data)
 
     if response.status_code == 201:
         return response.json()
     
     if response.status_code == 401 and check_token(session):
-        return post_request(session, url, params, data=json.dumps(data))
+        return post_request(session, url, params, data=serialized_data)
     else:
         app.logger.error('post_request:' + str(response.status_code))
         return response.text
@@ -159,18 +162,19 @@ def post_request(session, url, params={}, data={}):
 '''
 def put_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token'],
-        'Accept': 'application/json', 
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "Authorization" : "Bearer " + session['token'],
+        "Accept": "application/json", 
+        "Content-Type": "application/x-www-form-urlencoded"
     }
 
-    response = requests.put(url, headers=headers, params=params, data=json.dumps(data))
+    serialized_data = json.dumps(data)
+    response = requests.put(url, headers=headers, params=params, data=serialized_data)
 
     if response.status_code == 204 or response.status_code == 202 or response.status_code == 200:
         return response.status_code
     
     if response.status_code == 401 and check_token(session):
-        return put_request(session, url, params, data=json.dumps(data))
+        return put_request(session, url, params, data=serialized_data)
     else:
         app.logger.error('put_request:' + str(response.status_code))
         return response.text
@@ -183,17 +187,19 @@ def put_request(session, url, params={}, data={}):
 '''
 def delete_request(session, url, params={}, data={}):
     headers = {
-        'Authorization' : 'Bearer ' + session['token'],
-        'Content-Type' : 'application/json'
+        "Authorization" : "Bearer " + session['token'],
+        "Accept" : "application/json",
+        "Content-Type" : "application/json"
     }
 
-    response = requests.delete(url, headers=headers, params=params, data=json.dumps(data))
+    serialized_data = json.dumps(data)
+    response = requests.delete(url, headers=headers, params=params, data=serialized_data)
 
     if response.status_code == 200:
         return response.json()
     
     if response.status_code == 401 and check_token(session):
-        return delete_request(session, url, params, data=json.dumps(data))    
+        return delete_request(session, url, params, data=serialized_data)    
     else:
         app.logger.error('delete_request:' + str(response.status_code))
         return response.text
@@ -208,7 +214,7 @@ def toggle_shuffle(session, state):
     url = 'https://api.spotify.com/v1/me/player/shuffle'
 
     params = {
-        'state' : state
+        "state" : state
     }
 
     return put_request(session, url, params)
@@ -223,7 +229,7 @@ def toggle_repeat(session, state):
     url = 'https://api.spotify.com/v1/me/player/repeat'
 
     params = {
-        'state' : state
+        "state" : state
     }
 
     return put_request(session, url, params)
@@ -253,15 +259,15 @@ def search_spotify(session, query, type, limit=5):
 
     if type == 'create':
         params = {
-            'q' : query,
-            'type' : 'artist,track',
-            'limit' : limit
+            "q" : query,
+            "type" : "artist,track",
+            "limit" : limit
         }
     else:
         params = {
-            'q' : query,
-            'type' : type,
-            'limit' : limit
+            "q" : query,
+            "type" : type,
+            "limit" : limit
         }
 
     response = get_request(session, url, params)
@@ -344,9 +350,9 @@ def get_recommendations(session, seeds, tune_params, limit=5):
             seed_tracks.append(seed[2:])
     
     params = {
-        'seed_artists' : seed_artists,
-        'seed_tracks' : seed_tracks,
-        'limit' : limit
+        "seed_artists" : seed_artists,
+        "seed_tracks" : seed_tracks,
+        "limit" : limit
     }
 
     params.update(tune_params)
@@ -395,8 +401,8 @@ def create_playlist(session, name):
     url = 'https://api.spotify.com/v1/users/' + user['id'] + '/playlists'
 
     data = {
-        'name' : name,
-        'description' : 'created by cafégram'
+        "name" : name,
+        "description" : "created by cafégram"
     }
 
     response = post_request(session, url, data=data)
@@ -418,7 +424,7 @@ def add_tracks(session, playlist, track_uris):
     url = 'https://api.spotify.com/v1/playlists/' + playlist['id'] + '/tracks'
 
     data = {
-        'uris' : track_uris
+        "uris" : track_uris
     }
 
     response = post_request(session, url, data=data)
@@ -439,8 +445,8 @@ def get_tracks(session, time_range='short_term', limit=10):
     url = 'https://api.spotify.com/v1/me/top/tracks'
 
     params = {
-        'time_range' : time_range,
-        'limit' : limit
+        "time_range" : time_range,
+        "limit" : limit
     }
 
     response = get_request(session, url, params)
@@ -461,7 +467,7 @@ def get_playlist_tracks(session, playlist_id):
     url = 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks'
 
     params = {
-        'limit' : 50,
+        "limit" : 50,
     }
     response = get_request(session, url, params)
     if 'error' in response:
@@ -483,10 +489,10 @@ def delete_playlist(session, playlist_id, track_uris):
 
     tracks =[]
     for track in track_uris:
-        tracks.append({'uri' : track})
+        tracks.append({"uri" : track})
     
     data = {
-        'tracks' : tracks
+        "tracks" : tracks
     }
 
     response = delete_request(session, url, data=data)
@@ -524,7 +530,7 @@ def update_playlist_name(session, playlist_id, playlist_name):
     url = 'https://api.spotify.com/v1/playlists/' + playlist_id
 
     data = {
-        'name' : playlist_name
+        "name" : playlist_name
     }
 
     response = put_request(session, url, data=data)

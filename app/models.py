@@ -33,12 +33,12 @@ class Users(db.Model):
             playlist_id = getattr(user, playlist_attr)
             if playlist_id:
                 playlist_track_uris = get_playlist_tracks(session, playlist_id)
-                if playlist_track_uris is not None:
-                    delete_playlist(session, playlist_id, playlist_track_uris)
+                status = delete_playlist(session, playlist_id, playlist_track_uris)
+                if playlist_track_uris is not None and status is not None:
                     tracks = get_tracks(session, duration, 50)
                     track_uris = [track['uri'] for track in tracks['items']]
                     playlist = get_playlist(session, playlist_id)
-                    test = add_tracks(session, playlist, track_uris)
+                    add_tracks(session, playlist, track_uris)
                     updated = True
                     app.logger.info('Updated playlist {} for user {}.'.format(playlist_attr, user.username))
                 else:
