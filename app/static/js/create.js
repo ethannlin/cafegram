@@ -11,6 +11,7 @@ $('#createBtn').click(function() {
     var counter = 0;
     var data = {};
     data['update'] = $('#updates').is(':checked');
+    data['auto-update'] = $('#auto-update').is(':checked');
 
     selectedItems.forEach(item => {
         const dataId = item.getAttribute('data-id');
@@ -33,10 +34,8 @@ $('#createBtn').click(function() {
                 counter++;
             }
             // Reset slider values to default
-            if (sliderName == 'slider_popularity') {
+            if (sliderName == 'slider_popularity' || sliderName == 'slider_limit') {
                 slider.value = 50;
-            } else if (sliderName == 'slider_limit') {
-                slider.value = 25;
             } else {
                 slider.value = 0.5;
             }

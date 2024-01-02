@@ -56,13 +56,13 @@
                 <input type="text" id="playlist-name" placeholder="enter playlist name" class="form-control" value="cafégram recs :)">
             </div>
         </div>
-    
+
         <div class="row" style="margin-top: 20px;">
             <div class="col-sm-4">
                 <label class="form-check-label" for="limitLevel" data-toggle="tooltip" data-placement="right" title="max number of tracks in new playlist">track limit</label>
             </div>
             <div class="col-sm-6">
-                <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="50" value="25">
+                <input name="slider_limit" id="sliderLimitRange" class="slider-range" type="range" min="0" max="100" value="50">
             </div>
             <div class="col-sm-2">
                 <span class="slider-value" id="sliderLimitValue" name="limit_val">0</span>
@@ -177,17 +177,28 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="update" id="updates">
-                <label class="form-check-label" for="update">update</label>
+                <label class="form-check-label" for="update">update?</label>
             </div>
             <div class="col-sm-8">
                 <div class="form-text">
-                    <p>do you want to update your current playlist?</p>
+                    <p>do you want to update the current playlist on file?</p>
                 </div>
             </div>
         </div>
-        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create/update playlist</button>   
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-sm-4">
+                <input type="checkbox" class="form-check-input" name="auto-update" id="auto-update">
+                <label class="form-check-label" for="auto-update">auto update?</label>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-text">
+                    <p>would you like this playlist to update daily?</p>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create/update playlist</button>
         {% else %}
-        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>   
+        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>
         {% endif %}
         </div>
     </div>

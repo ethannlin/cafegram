@@ -25,14 +25,14 @@ def get_token(code):
     client_id = app.config['CLIENT_ID']
     client_secret = app.config['CLIENT_SECRET']
     redirect_uri = app.config['REDIRECT_URI']
-    
+
     token_url = 'https://accounts.spotify.com/api/token'
 
     headers = {
         'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
         'Content-Type' : 'application/x-www-form-urlencoded'
         }
-    
+
     body = {
         'grant_type' : 'authorization_code',
         'code' : code,
@@ -48,7 +48,7 @@ def get_token(code):
     else:
         app.logger.error('get_token:' + str(response.status_code))
         return None
-    
+
 '''
     Function: refresh_token
     -----------------------
@@ -65,7 +65,7 @@ def refresh_token(token):
         'Authorization' : 'Basic ' + str(base64.b64encode(bytes(client_id + ':' + client_secret, 'utf-8')), 'utf-8'),
         'Content-Type' : 'application/x-www-form-urlencoded'
     }
-    
+
     body = {
         'grant_type' : 'refresh_token',
         'refresh_token' : token
@@ -95,7 +95,7 @@ def check_token(session):
         token = refresh_token(session['refresh_token'])
         if token is not None:
             session['token'] = token[0]
-            session['expires_in'] = time.time() + token[1]
+            session['expires_in'] = time.time() + token[2]
         else:
             app.logger.error('check_token_error')
             return False
@@ -122,13 +122,13 @@ def get_request(session, url, params={}):
 
     if response.status_code == 200:
         return response.json()
-    
+
     if response.status_code == 401 and check_token(session):
         return get_request(session, url, params)
     else:
         app.logger.error('get_request:' + str(response.status_code))
         return response.text
-    
+
 '''
     Function: post_request
     ----------------------
@@ -147,13 +147,13 @@ def post_request(session, url, params={}, data={}):
 
     if response.status_code == 201:
         return response.json()
-    
+
     if response.status_code == 401 and check_token(session):
         return post_request(session, url, params, data=serialized_data)
     else:
         app.logger.error('post_request:' + str(response.status_code))
         return response.text
-    
+
 '''
     Function: put_request
     ---------------------
@@ -163,7 +163,7 @@ def post_request(session, url, params={}, data={}):
 def put_request(session, url, params={}, data={}):
     headers = {
         "Authorization" : "Bearer " + session['token'],
-        "Accept": "application/json", 
+        "Accept": "application/json",
         "Content-Type": "application/x-www-form-urlencoded"
     }
 
@@ -172,7 +172,7 @@ def put_request(session, url, params={}, data={}):
 
     if response.status_code == 204 or response.status_code == 202 or response.status_code == 200:
         return response.status_code
-    
+
     if response.status_code == 401 and check_token(session):
         return put_request(session, url, params, data=serialized_data)
     else:
@@ -197,13 +197,13 @@ def delete_request(session, url, params={}, data={}):
 
     if response.status_code == 200:
         return response.json()
-    
+
     if response.status_code == 401 and check_token(session):
-        return delete_request(session, url, params, data=serialized_data)    
+        return delete_request(session, url, params, data=serialized_data)
     else:
         app.logger.error('delete_request:' + str(response.status_code))
         return response.text
-    
+
 '''
     Function: toggle_shuffle
     ------------------------
@@ -274,7 +274,7 @@ def search_spotify(session, query, type, limit=5):
     if 'error' in response:
         app.logger.error('search_spotify:' + response)
         return None
-        
+
     results = []
 
     if type == 'create':
@@ -309,7 +309,7 @@ def search_spotify(session, query, type, limit=5):
     results_json = []
     for item in results:
         results_json.append({'label' : item[0], 'value' : item[1]})
-    
+
     return results_json
 
 '''
@@ -331,24 +331,28 @@ def play(session, type, uri):
         }
 
     return put_request(session, url, data=data)
-    
+
 '''
     Function: get_recommendations
     -----------------------------
     Returns json response from recommendations request
     Returns status code if error occurs
 '''
-def get_recommendations(session, seeds, tune_params, limit=5):
+def get_recommendations(session, seeds, tune_params, limit=50):
     url = 'https://api.spotify.com/v1/recommendations'
 
     seed_artists = []
     seed_tracks = []
-    for seed in seeds:
-        if seed[0] == 'a':
-            seed_artists.append(seed[2:])
-        if seed[0] == 't':
-            seed_tracks.append(seed[2:])
-    
+    if type(seeds) is dict:
+        seed_artists = seeds['seed_artists']
+        seed_tracks = seeds['seed_tracks']
+    else:
+        for seed in seeds:
+            if seed[0] == 'a':
+                seed_artists.append(seed[2:])
+            if seed[0] == 't':
+                seed_tracks.append(seed[2:])
+
     params = {
         "seed_artists" : seed_artists,
         "seed_tracks" : seed_tracks,
@@ -362,12 +366,12 @@ def get_recommendations(session, seeds, tune_params, limit=5):
     if 'error' in response:
         app.logger.error('get_recommendations:' + response)
         return None
-    
+
     uris = []
 
     for track in response['tracks']:
         uris.append(track['uri'])
-    
+
     return uris
 
 '''
@@ -384,7 +388,7 @@ def get_user(session):
     if 'error' in response:
         app.logger.error('get_user:' + response)
         return None
-    
+
     return response
 
 '''
@@ -397,7 +401,7 @@ def create_playlist(session, name):
     user = get_user(session)
     if user is None:
         return None
-    
+
     url = 'https://api.spotify.com/v1/users/' + user['id'] + '/playlists'
 
     data = {
@@ -410,9 +414,9 @@ def create_playlist(session, name):
     if 'error' in response:
         app.logger.error('create_playlist:' + response)
         return None
-    
+
     return response
-    
+
 '''
     function: add_tracks
     --------------------
@@ -432,7 +436,7 @@ def add_tracks(session, playlist, track_uris):
     if 'error' in response:
         app.logger.error('add_tracks:' + response)
         return None
-    
+
     return playlist['uri'], playlist['id']
 
 '''
@@ -454,7 +458,7 @@ def get_tracks(session, time_range='short_term', limit=10):
     if 'error' in response:
         app.logger.error('get_tracks:' + response)
         return None
-    
+
     return response
 
 '''
@@ -467,7 +471,7 @@ def get_playlist_tracks(session, playlist_id):
     url = 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks'
 
     params = {
-        "limit" : 50,
+        "limit" : 100,
     }
     response = get_request(session, url, params)
     if 'error' in response:
@@ -500,7 +504,7 @@ def delete_playlist(session, playlist_id, track_uris):
     if 'error' in response:
         app.logger.error('delete_playlist:' + response)
         return None
-    
+
     return response
 
 '''
@@ -511,13 +515,13 @@ def delete_playlist(session, playlist_id, track_uris):
 '''
 def get_playlist(session, playlist_id):
     url = 'https://api.spotify.com/v1/playlists/{playlist_id}'.format(playlist_id=playlist_id)
-    
+
     response = get_request(session, url)
 
     if 'error' in response:
         app.logger.error('get_playlist:' + response)
         return None
-    
+
     return response
 
 '''
@@ -535,7 +539,7 @@ def update_playlist_name(session, playlist_id, playlist_name):
 
     response = put_request(session, url, data=data)
 
-    if response != 200 and response != 202 and response != 204: 
+    if response != 200 and response != 202 and response != 204:
         app.logger.error('change_playlist_name:' + response)
         return None
 
