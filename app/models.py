@@ -6,31 +6,40 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     refresh_token = db.Column(db.String(150), index=True, unique=True)
-    playlist_id_short = db.Column(db.String(30), index=True, unique=True)
-    playlist_id_medium = db.Column(db.String(30), index=True, unique=True)
-    playlist_id_long = db.Column(db.String(30), index=True, unique=True)
-    playlist_id_recs = db.Column(db.String(30), index=True, unique=True)
 
-    def __init__(self, username, refresh_token, playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None, playlist_id_recs=None):
+    def __init__(self, username, refresh_token):
         self.username = username
         self.refresh_token = refresh_token
-        self.playlist_id_short = playlist_id_short
-        self.playlist_id_medium = playlist_id_medium
-        self.playlist_id_long = playlist_id_long
-        self.playlist_id_recs = playlist_id_recs
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+class TopTracks(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id',  ondelete='CASCADE'), nullable=False)
+    user = db.relationship('Users', backref=db.backref('top_tracks', lazy=True))
+    playlist_id_short = db.Column(db.String(30), index=True, unique=True)
+    playlist_id_medium = db.Column(db.String(30), index=True, unique=True)
+    playlist_id_long = db.Column(db.String(30), index=True, unique=True)
+
+    def __init__(self, user_id, playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None):
+        self.user_id = user_id
+        self.playlist_id_short = playlist_id_short
+        self.playlist_id_medium = playlist_id_medium
+        self.playlist_id_long = playlist_id_long
+
+    def __repr__(self):
+        return '<TopTracks {}>'.format(self.user.username)
+
     @staticmethod
     def update_playlists():
-        users = Users.query.all()
+        topTracks = TopTracks.query.all()
         max_tries = 5
         retry_delay = 2
 
         def fetch_and_add_tracks(duration, playlist_attr):
             nonlocal updated
-            playlist_id = getattr(user, playlist_attr)
+            playlist_id = getattr(track, playlist_attr)
             if playlist_id:
                 playlist_track_uris = get_playlist_tracks(session, playlist_id)
                 status = delete_playlist(session, playlist_id, playlist_track_uris)
@@ -40,21 +49,23 @@ class Users(db.Model):
                     playlist = get_playlist(session, playlist_id)
                     add_tracks(session, playlist, track_uris)
                     updated = True
-                    app.logger.info('Updated playlist {} for user {}.'.format(playlist_attr, user.username))
+                    app.logger.info('Updated playlist {} (id: {}) for user {}.'.format(playlist_attr, playlist_id, track.user.username))
                 else:
-                    setattr(user, playlist_attr, None)
-                    app.logger.warning('Deleted playlist {} for user {}. Unable to get playlist tracks.'.format(playlist_attr, user.username))
+                    setattr(track, playlist_attr, None)
+                    app.logger.warning('Deleted playlist {} (id: {}) for user {}. Unable to get playlist tracks.'.format(playlist_attr, playlist_id, track.user.username))
 
         for i in range(max_tries):
             try:
-                for user in users:
+                for track in topTracks:
                     updated = False
 
-                    token, refresh, expires_in = refresh_token(user.refresh_token)
+                    token, refresh, expires_in = refresh_token(track.user.refresh_token)
                     if token is None:
-                        db.session.delete(user)
-                        app.logger.warning('Deleted user {}. Token unable to be updated.'.format(user.username))
+                        db.session.delete(track.user)
+                        app.logger.warning('Deleted user {}. Token unable to be updated.'.format(track.user.username))
                         continue
+
+                    track.user.refresh_token = refresh
 
                     session = {'token': token, 'refresh_token': refresh, 'expires_in': expires_in}
 
@@ -63,8 +74,8 @@ class Users(db.Model):
                     fetch_and_add_tracks('long_term', 'playlist_id_long')
 
                     if not updated:
-                        db.session.delete(user)
-                        app.logger.warning('Deleted user {}. No playlists able to be updated.'.format(user.username))
+                        db.session.delete(track.user)
+                        app.logger.warning('Deleted user {}. No playlists able to be updated.'.format(track.user.username))
 
                 db.session.commit()
                 app.logger.info('Updated all user playlists.')
@@ -80,23 +91,24 @@ class Users(db.Model):
 
 class CustomPlaylists(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True)
-    refresh_token = db.Column(db.String(150), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user = db.relationship('Users', backref=db.backref('custom_playlists', lazy=True))
+    playlist_name = db.Column(db.String(100), index=True)
     playlist_id = db.Column(db.String(30), index=True, unique=True)
     seed_artists = db.Column(db.String(1000))
     seed_tracks = db.Column(db.String(1000))
     seed_attr = db.Column(db.String(1000))
 
-    def __init__(self, username, refresh_token, playlist_id, seed_artists, seed_tracks, seed_attr):
-        self.username = username
-        self.refresh_token = refresh_token
+    def __init__(self, user_id, playlist_id, playlist_name, seed_artists, seed_tracks, seed_attr):
+        self.user_id = user_id
         self.playlist_id = playlist_id
+        self.playlist_name = playlist_name
         self.seed_artists = seed_artists
         self.seed_tracks = seed_tracks
         self.seed_attr = seed_attr
 
     def __repr__(self):
-        return '<Playlist {}>'.format(self.playlist_id)
+        return '<CustomPlaylists {}>'.format(self.playlist_name)
 
     @staticmethod
     def update_playlists():
@@ -107,11 +119,13 @@ class CustomPlaylists(db.Model):
         for i in range(max_tries):
             try:
                 for playlist in playlists:
-                    token, refresh, expires_in = refresh_token(playlist.refresh_token)
+                    token, refresh, expires_in = refresh_token(playlist.user.refresh_token)
                     if token is None:
                         db.session.delete(playlist)
-                        app.logger.warning('Deleted playlist {}. Token unable to be updated.'.format(playlist.playlist_id))
+                        app.logger.warning('Deleted playlist {}(id: {}) for {}. Token unable to be updated.'.format(playlist.playlist_name, playlist.playlist_id, playlist.user.username))
                         continue
+
+                    playlist.user.refresh_token = refresh
 
                     session = {'token': token, 'refresh_token': refresh, 'expires_in': expires_in}
 
@@ -128,13 +142,13 @@ class CustomPlaylists(db.Model):
                             playlist_info = get_playlist(session, playlist.playlist_id)
                             tracks = get_recommendations(session, seeds, tune_params, limit)
                             add_tracks(session, playlist_info, tracks)
-                            app.logger.info('Updated playlist {}.'.format(playlist.playlist_id))
+                            app.logger.info('Updated playlist {} (id: {}) for {}.'.format(playlist.playlist_name, playlist.playlist_id, playlist.user.username))
                         else:
                             db.session.delete(playlist)
-                            app.logger.warning('Deleted playlist {}. Unable to get playlist tracks.'.format(playlist.playlist_id))
+                            app.logger.warning('Deleted playlist {} (id: {}) for {}. Unable to get playlist tracks.'.format(playlist.playlist_name, playlist.playlist_id, playlist.user.username))
                     else:
                         db.session.delete(playlist)
-                        app.logger.warning('Deleted playlist {}. Unable to get playlist tracks.'.format(playlist.playlist_id))
+                        app.logger.warning('Deleted playlist {} (id: {}) for {}. Unable to get playlist tracks.'.format(playlist.playlist_name, playlist.playlist_id, playlist.user.username))
 
                 db.session.commit()
                 app.logger.info('Updated all custom playlists.')

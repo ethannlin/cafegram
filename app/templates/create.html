@@ -73,7 +73,7 @@
         <div class="row" style="margin-top: 20px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="acoustic_level" id="acousticLevel">
-                <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acousticness</label>
+                <label class="form-check-label" for="acousticLevel" data-toggle="tooltip" data-placement="right" title="a confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.">acoustic</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_acoustic" id="sliderAcousticRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -86,7 +86,7 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="danceability_level" id="danceabilityLevel">
-                <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceability</label>
+                <label class="form-check-label" for="danceabilityLevel" data-toggle="tooltip" data-placement="right" title="danceability describes how suitable a track is for dancing based on a combination of musical elements. a value of 0.0 is least danceable and 1.0 is most danceable.">danceable</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_danceability" id="sliderDanceabilityRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -99,7 +99,7 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="energy_level" id="energyLevel">
-                <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energy</label>
+                <label class="form-check-label" for="energyLevel" data-toggle="tooltip" data-placement="right" title="energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity.">energetic</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_energy" id="sliderEnergyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -112,7 +112,7 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="intrumental_level" id="instrumentalLevel">
-                <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumentalness</label>
+                <label class="form-check-label" for="instrumentalLevel" data-toggle="tooltip" data-placement="right" title="the value for instrumentalness ranges from 0 to 1, with higher values indicating a higher likelihood of the track being instrumental (i.e., without vocals), while lower values suggest the presence of vocals in the music.">instrumental</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_instrumental" id="sliderInstrumentalRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -125,7 +125,7 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="lively_level" id="livelyLevel">
-                <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">liveliness</label>
+                <label class="form-check-label" for="livelyLevel" data-toggle="tooltip" data-placement="right" title="liveliness' values ranges from 0 to 1, where higher values suggest a greater likelihood of the track being a live recording or containing live characteristics.">lively</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_lively" id="sliderLivelyRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -151,7 +151,7 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="speech_level" id="speechLevel">
-                <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechiness</label>
+                <label class="form-check-label" for="speechLevel" data-toggle="tooltip" data-placement="right" title="speechiness' values ranges between 0 and 1, where higher values suggest a higher likelihood of the track containing spoken word content.">speechful</label>
             </div>
             <div class="col-sm-6">
                 <input name="slider_speech" id="sliderSpeechRange" class="slider-range" type="range" min="0.0" max="1.0" value="0.5" step="0.01">
@@ -178,22 +178,11 @@
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="update" id="updates">
-                <label class="form-check-label" for="update">update?</label>
+                <label class="form-check-label" for="update">automatic updates?</label>
             </div>
             <div class="col-sm-8">
                 <div class="form-text">
-                    <p>do you want to update the current playlist on file?</p>
-                </div>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 10px;">
-            <div class="col-sm-4">
-                <input type="checkbox" class="form-check-input" name="auto-update" id="auto-update">
-                <label class="form-check-label" for="auto-update">auto update?</label>
-            </div>
-            <div class="col-sm-8">
-                <div class="form-text">
-                    <p>would you like this playlist to update daily?</p>
+                    <p>would you like this playlist to be updated automatically every day with new content?</p>
                 </div>
             </div>
         </div>

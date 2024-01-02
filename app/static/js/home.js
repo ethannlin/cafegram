@@ -63,11 +63,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id);
 
-        // transfer playback 
+        // transfer playback
         const endpointURL = `/api/transfer/${device_id}`;
         $.ajax({
             url: endpointURL,
-            type: 'PUT', 
+            type: 'PUT',
             success: function(response) {
                 // Handle success response from the API if needed
                 console.log(response);
@@ -123,7 +123,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         const position_ms = position_percent / 100 * track_duration;
         player.seek(position_ms);
     });
-    
+
     // Check state every second
     setInterval( function() {
         player.getCurrentState().then(state => {
@@ -150,7 +150,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         // Update button text based on playback state
         const isPlaying = !state.paused;
         $('#togglePlay').html(isPlaying ? '<span class="glyphicon glyphicon-pause"></span>' : '<span class="glyphicon glyphicon-play"></span>');
-        
+
         // Update track information
         $('#track-info').text(state.track_window.current_track.name + ' by ' + state.track_window.current_track.artists[0].name);
         $('#album-art').attr('src', state.track_window.current_track.album.images[0].url);
@@ -161,7 +161,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         } else {
             $('#shuffle').css('font-weight', 'normal');
         }
-        
+
         if (repeat === 0) {
             $('#repeat').css('font-weight', 'normal');
             $('#repeat').css('text-decoration', 'none');
@@ -182,7 +182,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     player.connect().then(success => {
         if (success) {
             console.log('The Web Playback SDK successfully connected to Spotify!');
-            
+
             // Volume slider change event
             $('#volume-slider').on('input', function() {
                 const volumeValue = $(this).val() / 100; // Normalize volume to a value between 0 and 1
@@ -225,7 +225,7 @@ $('#shuffle').on('click', function() {
     // Make an AJAX request to toggle the shuffle
     $.ajax({
         url: endpointURL,
-        type: 'PUT', 
+        type: 'PUT',
         success: function(response) {
             // Handle success response from the API if needed
             console.log(response);
@@ -235,7 +235,7 @@ $('#shuffle').on('click', function() {
             console.error('Error toggling shuffle:', error);
         }
     });
-        
+
 });
 
 // Toggle repeat
@@ -258,7 +258,7 @@ $('#repeat').on('click', function() {
     // Make an AJAX request to toggle the repeat
     $.ajax({
         url: endpointURL,
-        type: 'PUT', 
+        type: 'PUT',
         success: function(response) {
             // Handle success response from the API if needed
             console.log(response);
@@ -286,15 +286,15 @@ $(document).ready(function() {
         },
         minLength: 2,
         select: function(event, ui) {
-            $(this).val(ui.item.label); 
-            
+            $(this).val(ui.item.label);
+
             // Construct the URL based on the selected item
             endpointURL = `/api/play/${$('#search-type').val()}/${ui.item.value}`;
-            
+
             // Make an AJAX request to play the selected item
             $.ajax({
                 url: endpointURL,
-                type: 'PUT', 
+                type: 'PUT',
                 success: function(response) {
                     // Handle success response from the API if needed
                     console.log(response);

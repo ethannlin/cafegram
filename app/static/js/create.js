@@ -40,14 +40,12 @@ $('#createBtn').click(function() {
                 slider.value = 0.5;
             }
         });
-        
+
         // Reset slider values to default
         const slider_values = document.querySelectorAll('.slider-value');
             slider_values.forEach(slider => {
-                if (slider.getAttribute('name') === 'popularity_val') {
+                if (slider.getAttribute('name') === 'popularity_val' && slider.getAttribute('name') === 'limit_val') {
                     slider.innerHTML = 50;
-                } else if (slider.getAttribute('name') === 'limit_val') {
-                    slider.innerHTML = 25;
                 } else {
                     slider.innerHTML = 0;
                 }

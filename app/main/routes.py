@@ -2,7 +2,7 @@ import time
 from app.main import bp
 from flask import jsonify, render_template, current_app as app, session, redirect, request
 from app.functions import delete_playlist, get_playlist, get_playlist_tracks, get_state_key, get_token, get_tracks, get_user, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks, update_playlist_name
-from app.models import Users, CustomPlaylists
+from app.models import TopTracks, Users, CustomPlaylists
 from app import db
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -14,7 +14,7 @@ def home():
     user = get_user(session)
     if user == "User not registered in the Developer Dashboard":
         return render_template('home.html', title='home', token=session['token'], expires_in=session['expires_in'], error='Error: User not registered by admin in the Developer Dashboard.')
-    
+
     return render_template('home.html', title='home', token=session['token'], expires_in=session['expires_in'])
 
 @bp.route('/about')
@@ -68,10 +68,12 @@ def create():
 
     existing_user = Users.query.filter_by(username=user['id']).first()
     update = False
-    if existing_user is not None and existing_user.playlist_id_recs is not None:
+    username = None
+    if existing_user is not None and existing_user.custom_playlists is not None:
         update = True
+        username = existing_user.username
 
-    return render_template('create.html', title='create', token=session['token'], update=update)
+    return render_template('create.html', title='create', token=session['token'], update=update, username=username)
 
 @bp.route('/discover')
 def discover():
@@ -87,10 +89,6 @@ def discover():
             return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
         for track in top_tracks['items']:
             track_ids[i].append(track['id'])
-
-    user = get_user(session)
-    if user is None or user == "User not registered in the Developer Dashboard":
-        return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, error='Error: Could not retrieve user.')
 
     return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids)
 
@@ -160,16 +158,22 @@ def discover_create():
 
             existing_user = Users.query.filter_by(username=user['id']).first()
             if existing_user is not None:
-                if short_term_uri:
-                    existing_user.playlist_id_short = short_term_id
-                if medium_term_uri:
-                    existing_user.playlist_id_medium = medium_term_id
-                if long_term_uri:
-                    existing_user.playlist_id_long = long_term_id
-                app.logger.info('User {} top track playlists updated.'.format(user['id']))
+                existing_playlists = TopTracks.query.filter_by(user_id=existing_user.id).first()
+                if existing_playlists is not None:
+                    if short_term_uri:
+                        existing_playlists.playlist_id_short = short_term_id
+                    if medium_term_uri:
+                        existing_playlists.playlist_id_medium = medium_term_id
+                    if long_term_uri:
+                        existing_playlists.playlist_id_long = long_term_id
+                    app.logger.info('User {} top track playlists updated.'.format(user['id']))
             else:
-                u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=short_term_id, playlist_id_medium=medium_term_id, playlist_id_long=long_term_id, playlist_id_recs=None)
+                u = Users(username=user['id'], refresh_token=session['refresh_token'])
                 db.session.add(u)
+                db.session.commit()
+
+                tt = TopTracks(user_id=u.id, playlist_id_short=short_term_id, playlist_id_medium=medium_term_id, playlist_id_long=long_term_id)
+                db.session.add(tt)
                 app.logger.info('User {} added to the db.'.format(user['id']))
 
             app.logger.info('User {} playlists to be autoupdated.'.format(user['id']))
@@ -226,39 +230,8 @@ def recommendation_playlist():
         user = get_user(session)
         if user is None:
             return render_template('create.html', title='create', token=session['token'], error='Error: Could not retrieve user.')
-        existing_user = Users.query.filter_by(username=user['id']).first()
 
-        if existing_user is not None:
-            if request.form.get('update') == 'true' and existing_user.playlist_id_recs is not None:
-                playlist = get_playlist(session, existing_user.playlist_id_recs)
-                if playlist is None:
-                    return render_template('create.html', title='create', token=session['token'], update=True, error='Error: Could not retrieve playlist.')
-
-                playlist_tracks = get_playlist_tracks(session, existing_user.playlist_id_recs)
-                if playlist_tracks is None:
-                    return render_template('create.html', title='create', token=session['token'],update=True, error='Error: Could not retrieve playlist tracks.')
-
-                update_playlist_name(session, existing_user.playlist_id_recs, playlist_name)
-                delete_playlist(session, existing_user.playlist_id_recs, playlist_tracks)
-                app.logger.info('User {} recommended playlist in db updated.'.format(user['id']))
-            else:
-                playlist = create_playlist(session, playlist_name)
-                if playlist is None:
-                    return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
-                existing_user.playlist_id_recs = playlist['id']
-                app.logger.info('User {} recommended playlist created and db updated.'.format(user['id']))
-        else:
-            playlist = create_playlist(session, playlist_name)
-            if playlist is None:
-                return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
-
-            u = Users(username=user['id'], refresh_token=session['refresh_token'], playlist_id_short=None, playlist_id_medium=None, playlist_id_long=None, playlist_id_recs=playlist['id'])
-            app.logger.info('User {} added to the db.'.format(user['id']))
-            db.session.add(u)
-
-        if request.form.get('auto-update') == 'true':
-            existing_playlist = CustomPlaylists.query.filter_by(playlist_id=playlist['id']).first()
-            id = playlist['id']
+        if request.form.get('update') == 'true':
             seed_artists = ""
             seed_tracks = ""
             seed_attr = ""
@@ -276,16 +249,32 @@ def recommendation_playlist():
             for key, value in tune_params.items():
                 seed_attr += key + ':' + value + ','
             seed_attr += 'n:' + limit
+            existing_user = Users.query.filter_by(username=user['id']).first()
 
-            if existing_playlist is None:
-                c = CustomPlaylists(playlist_id=id, username=user['id'], refresh_token=session['refresh_token'], seed_artists=seed_artists, seed_tracks=seed_tracks, seed_attr=seed_attr)
-                app.logger.info('User {} custom playlist added to the db.'.format(user['id']))
+            if existing_user is not None:
+                playlist = create_playlist(session, playlist_name)
+                if playlist is None:
+                    return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
+
+                c = CustomPlaylists(user_id=existing_user.id, playlist_id=playlist['id'], playlist_name=playlist_name, seed_artists=seed_artists, seed_tracks=seed_tracks, seed_attr=seed_attr)
                 db.session.add(c)
+                app.logger.info('{} created for user {}.'.format(playlist_name, user['id']))
             else:
-                existing_playlist.seed_artists = seed_artists
-                existing_playlist.seed_tracks = seed_tracks
-                existing_playlist.seed_attr = seed_attr
-                app.logger.info('User {} custom playlist in db updated.'.format(user['id']))
+                playlist = create_playlist(session, playlist_name)
+                if playlist is None:
+                    return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
+
+                u = Users(username=user['id'], refresh_token=session['refresh_token'])
+                db.session.add(u)
+                db.session.commit()
+
+                c = CustomPlaylists(user_id=u.id, playlist_id=playlist['id'], playlist_name=playlist_name, seed_artists=seed_artists, seed_tracks=seed_tracks, seed_attr=seed_attr)
+                db.session.add(c)
+                app.logger.info('User {} added to the db.'.format(user['id']))
+        else:
+            playlist = create_playlist(session, playlist_name)
+            if playlist is None:
+                return render_template('create.html', title='create', token=session['token'], error='Error: Could not create playlist.')
 
         db.session.commit()
 
@@ -341,7 +330,7 @@ def autocomplete():
 @bp.route('/api/update-playlists', methods=['POST'])
 def update():
     with app.app_context():
-        Users.update_playlists()
+        TopTracks.update_playlists()
         CustomPlaylists.update_playlists()
 
     return jsonify({'message': 'Playlist update triggered successfully'}), 200
