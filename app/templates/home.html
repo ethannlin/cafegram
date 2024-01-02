@@ -43,6 +43,9 @@
     </div>
     <div class="col-md-4 text-center vertical-center">
         {% if token %}
+            {% if error %}
+                <p style="color: #302c2c; font-weight: bold;">{{ error }}</p>
+            {% else %}
             <div id="spotify-player">
                 <div id="track" style="margin-bottom: 15px;">
                     <h4 id="track-info" style="font-weight: bold;"></h4>
@@ -82,9 +85,11 @@
                 const expires_in = '{{ expires_in }}';
             </script>
             <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+            {% endif %}
         {% else %}
             <div id="spotify-login">
                 <p style="font-weight: bold; color:#302c2c">want the webplayer?</p>
+                <p style="font-weight: bold; color:#302c2c">note: feature only available to admin approved users</p>
                 <button class="btn btn-primary" type="button" id="login" style="color: #bfbfbf; background-color: #302c2c">login to spotify</a>
             </div>
             <script>

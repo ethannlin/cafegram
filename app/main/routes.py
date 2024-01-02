@@ -10,6 +10,11 @@ from app import db
 def home():
     if 'token' not in session or 'expires_in' not in session or time.time() > session['expires_in']:
         return render_template('home.html', title='home')
+
+    user = get_user(session)
+    if user == "User not registered in the Developer Dashboard":
+        return render_template('home.html', title='home', token=session['token'], expires_in=session['expires_in'], error='Error: User not registered by admin in the Developer Dashboard.')
+    
     return render_template('home.html', title='home', token=session['token'], expires_in=session['expires_in'])
 
 @bp.route('/about')
@@ -58,7 +63,7 @@ def create():
         return render_template('create.html', title='create')
 
     user = get_user(session)
-    if user is None:
+    if user is None or user == "User not registered in the Developer Dashboard":
         return render_template('create.html', title='create', token=session['token'], error='Error: Could not retrieve user.')
 
     existing_user = Users.query.filter_by(username=user['id']).first()
@@ -78,13 +83,13 @@ def discover():
     # get user's top tracks
     for i in range(3):
         top_tracks = get_tracks(session, term[i], 10)
-        if top_tracks is None:
+        if top_tracks is None or top_tracks == "User not registered in the Developer Dashboard":
             return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
         for track in top_tracks['items']:
             track_ids[i].append(track['id'])
 
     user = get_user(session)
-    if user is None:
+    if user is None or user == "User not registered in the Developer Dashboard":
         return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids, error='Error: Could not retrieve user.')
 
     return render_template('discover.html', title='discover', token=session['token'], track_ids=track_ids)
