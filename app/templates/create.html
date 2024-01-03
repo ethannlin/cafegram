@@ -174,7 +174,6 @@
             </div>
         </div>
 
-        {% if update %}
         <div class="row" style="margin-top: 10px;">
             <div class="col-sm-4">
                 <input type="checkbox" class="form-check-input" name="update" id="updates">
@@ -186,10 +185,7 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create/update playlist</button>
-        {% else %}
         <button class="btn btn-default" id="createBtn" type="button" data-dismiss="modal" style="margin-top:15px; color: #bfbfbf; background-color: #302c2c;">create playlist</button>
-        {% endif %}
         </div>
     </div>
     <script src ="{{ url_for('static', filename='js/create.js') }}"></script>

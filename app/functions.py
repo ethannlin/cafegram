@@ -523,24 +523,3 @@ def get_playlist(session, playlist_id):
         return None
 
     return response
-
-'''
-    update_playlist_name
-    ---------------
-    update playlist name
-    Returns status code if error occurs
-'''
-def update_playlist_name(session, playlist_id, playlist_name):
-    url = 'https://api.spotify.com/v1/playlists/' + playlist_id
-
-    data = {
-        "name" : playlist_name
-    }
-
-    response = put_request(session, url, data=data)
-
-    if response != 200 and response != 202 and response != 204:
-        app.logger.error('change_playlist_name:' + response)
-        return None
-
-    return response

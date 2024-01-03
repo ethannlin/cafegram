@@ -1,7 +1,7 @@
 import time
 from app.main import bp
 from flask import jsonify, render_template, current_app as app, session, redirect, request
-from app.functions import delete_playlist, get_playlist, get_playlist_tracks, get_state_key, get_token, get_tracks, get_user, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks, update_playlist_name
+from app.functions import get_state_key, get_token, get_tracks, get_user, toggle_shuffle, toggle_repeat, transfer_playback, refresh_token, search_spotify, play, get_recommendations, create_playlist, add_tracks
 from app.models import TopTracks, Users, CustomPlaylists
 from app import db
 
@@ -66,14 +66,7 @@ def create():
     if user is None or user == "User not registered in the Developer Dashboard":
         return render_template('create.html', title='create', token=session['token'], error='Error: Could not retrieve user.')
 
-    existing_user = Users.query.filter_by(username=user['id']).first()
-    update = False
-    username = None
-    if existing_user is not None and existing_user.custom_playlists is not None:
-        update = True
-        username = existing_user.username
-
-    return render_template('create.html', title='create', token=session['token'], update=update, username=username)
+    return render_template('create.html', title='create', token=session['token'])
 
 @bp.route('/discover')
 def discover():
