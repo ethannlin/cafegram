@@ -36,7 +36,27 @@
                     <li><a style="color:#bfbfbf" href="{{ url_for('main.create') }}">create</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li><a style="color:#bfbfbf" href="" id="pomodoroTimer">timer</a></li>
                 </ul>
+            </div>
+        </div>
+        <div id="timerModal" class="modal">
+            <div class="timer-modal-content">
+                <span class="close" style="position: absolute; top: 10px; right: 20px;" data-dismiss="modal">&times;</span>
+                <h1 class="text-center" style="font-weight: bold; margin-bottom: 0px;">pomodoro timer</h1>
+                <form id="timerForm" class="text-center">
+                    <input type="number" id="minutes" name="minutes" min="1" max="999" placeholder="25" value="25" style="margin-top: 10px; margin-right: 5px; width: 40px;">
+                    <label for="minutes" style="font-weight: bold">minutes</label>
+                </form>
+                <div id="timer-display" class="text-center">
+                </div>
+                <div id="timer-buttons" class="text-center">
+                    <button type="button" class="btn btn-default" id="startTimer" style="color: #bfbfbf; background-color: #302c2c; margin-top: 5px; margin-left: 5px; width: 50px;">start</button>
+                </div>
+                <div id="timer-description" class="text-center">
+                    <p style="margin-top: 10px; margin-bottom: 0px;">the pomodoro technique is a time management method where you set a timer for a chosen duration. when it ends, a chime sounds and your audio pauses, signaling a break time.</p>
+                </div>
+                <audio id="alarmSound" src="/static/audio/alarm.mp3" preload="auto"></audio>
             </div>
         </div>
     </nav>
@@ -45,7 +65,7 @@
 {% block content %}
 <div class="wrapper">
     {% block app_content %}
-{% endblock %}
+    {% endblock %}
 </div>
 <footer class="text-center footer">
     <div class="container-fluid">
@@ -58,4 +78,5 @@
 
 {% block scripts %}
 <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script>
+<script src="{{url_for('static', filename='js/pomodoro.js')}}"></script>
 {% endblock %}
