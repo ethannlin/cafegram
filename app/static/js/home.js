@@ -20,8 +20,7 @@ function refreshAccessToken() {
         success: function (response) {
             // Handle success response from the API if needed
             accessToken = response["token"];
-            expirationTime =
-                Math.floor(Date.now() / 1000) + response["expires_in"];
+            expirationTime = response["expires_in"];
         },
         error: function (error) {
             // Handle errors if the API call fails
@@ -132,6 +131,10 @@ window.onSpotifyWebPlaybackSDKReady = () => {
             const duration = state.duration;
             const position_percent = (position / duration) * 100;
             $("#postion-slider").val(position_percent);
+        });
+
+        window.spotifyPlayer.getVolume().then((volume) => {
+            $("#volume-slider").val(volume * 100);
         });
     }, 1000);
 
