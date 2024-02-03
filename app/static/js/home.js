@@ -53,7 +53,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
         getOAuthToken: (cb) => {
             ensureValidToken(cb);
         },
-        volume: 0.5,
+        volume: 0,
     });
 
     // Ready
@@ -70,6 +70,11 @@ window.onSpotifyWebPlaybackSDKReady = () => {
                 console.log(response);
                 $("#spotify-connect").hide();
                 $(".player-container").show();
+
+                setTimeout(() => {
+                    window.spotifyPlayer.setVolume(0.5);
+                    window.spotifyPlayer.pause();
+                }, 1000);
             },
             error: function (error) {
                 // Handle errors if the API call fails

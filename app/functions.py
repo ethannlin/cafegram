@@ -241,12 +241,12 @@ def toggle_repeat(session, state):
     Returns status code if error occurs
 '''
 def transfer_playback(session, device_id):
-    url = 'https://api.spotify.com/v1/me/player'
+    url = 'https://api.spotify.com/v1/me/player/play?device_id=' + device_id
 
     data = {
-        "device_ids": [device_id]
+        "context_uri" : "spotify:playlist:4GFGNWYzXTKBkqgdnTUXaQ"
     }
-
+    
     return put_request(session, url, data=data)
 '''
     Function: search_spotify
