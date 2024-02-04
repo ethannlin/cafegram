@@ -4,7 +4,7 @@ html {
 }
 
 body {
-    background-color: #ffe8d6;
+    background-color: #FFF0E4;
     font-family: "Circular", sans-serif;
 }
 
@@ -15,7 +15,7 @@ body {
 }
 
 .navbar-dark {
-    background-color: #302c2c;
+    background-color: #222020;
 }
 
 audio::-webkit-media-controls-current-time-display,
@@ -36,7 +36,7 @@ input::-webkit-inner-spin-button {
 }
 
 .page-info {
-    color: #302c2c;
+    color: #222020;
     font-family: "Circular", sans-serif;
     display: flex;
     justify-content: center;
@@ -143,10 +143,10 @@ input::-webkit-inner-spin-button {
 }
 
 .slider-value {
-    color: #bfbfbf;
+    color: #CCCCCC;
     text-align: center;
     border-radius: 3px;
-    background: #302c2c;
+    background: #222020;
     padding: 2px 10px;
     margin-left: 5px;
     margin-top: 0px !important;
@@ -175,7 +175,7 @@ input::-webkit-inner-spin-button {
     list-style: none;
     margin: 0px;
     position: relative;
-    border: 3px solid #302c2c;
+    border: 3px solid #222020;
     border-radius: 15px;
     background: rgba(239, 239, 239, 0.5);
 }
@@ -189,8 +189,8 @@ input::-webkit-inner-spin-button {
 .form-header {
     font-family: "Circular", sans-serif;
     text-align: center;
-    border-bottom: 2px solid #302c2c;
-    color: #302c2c !important;
+    border-bottom: 2px solid #222020;
+    color: #222020 !important;
 }
 
 .form-box {
@@ -208,7 +208,7 @@ input::-webkit-inner-spin-button {
     text-align: center;
     width: 100%;
     padding: 15px 40px 15px 40px;
-    border-top: 2px solid #302c2c;
+    border-top: 2px solid #222020;
 }
 
 .form-button {

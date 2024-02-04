@@ -44,7 +44,7 @@
     <div class="col-md-4 text-center vertical-center">
         {% if token %}
             {% if error %}
-                <p style="color: #302c2c; font-weight: bold;">{{ error }}</p>
+                <p style="color: #222020; font-weight: bold;">{{ error }}</p>
             {% else %}
             <div id="spotify-player">
                 <div id="track" style="margin-bottom: 15px;">
@@ -53,19 +53,19 @@
                 </div>
                 <div class="player-container" style="display: flex;  flex-direction: column; align-items: center;">
                     <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                        <span class="glyphicon glyphicon-volume-down" id="volume" style="margin-right: 5px; color: #302c2c; font-size: 20px;"></span>
+                        <span class="glyphicon glyphicon-volume-down" id="volume" style="margin-right: 5px; color: #222020; font-size: 20px;"></span>
                         <input type="range" min="0" max="100" value="50" id="volume-slider" style="margin-bottom: 5px; width: 250px;">
                     </div>
                     <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                        <span class="glyphicon glyphicon-time" id="volume" style="margin-right: 5px; color: #302c2c; font-size: 20px;"></span>
+                        <span class="glyphicon glyphicon-time" id="volume" style="margin-right: 5px; color: #222020; font-size: 20px;"></span>
                         <input type="range" min="0" max="100" step="0.001" value="0" id="postion-slider" style="margin-bottom: 5px; width: 250px;">
                     </div>
                     <div style="display: flex; justify-content: center;">
-                        <button class="btn btn-primary" type="button" id="shuffle" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c">s</button>
-                        <button class="btn btn-primary" type="button" id="prevTrack" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"><span class="glyphicon glyphicon-step-backward"></span></button>
-                        <button class="btn btn-primary" type="button" id="togglePlay" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"></button>
-                        <button class="btn btn-primary" type="button" id="nextTrack" style="margin-right: 5px; color: #bfbfbf; background-color: #302c2c"><span class="glyphicon glyphicon-step-forward"></span></button>
-                        <button class="btn btn-primary" type="button" id="repeat" style="color: #bfbfbf; background-color: #302c2c">r</button>
+                        <button class="btn btn-primary" type="button" id="shuffle" style="margin-right: 5px; color: #CCCCCC; background-color: #222020">s</button>
+                        <button class="btn btn-primary" type="button" id="prevTrack" style="margin-right: 5px; color: #CCCCCC; background-color: #222020"><span class="glyphicon glyphicon-step-backward"></span></button>
+                        <button class="btn btn-primary" type="button" id="togglePlay" style="margin-right: 5px; color: #CCCCCC; background-color: #222020"></button>
+                        <button class="btn btn-primary" type="button" id="nextTrack" style="margin-right: 5px; color: #CCCCCC; background-color: #222020"><span class="glyphicon glyphicon-step-forward"></span></button>
+                        <button class="btn btn-primary" type="button" id="repeat" style="color: #CCCCCC; background-color: #222020">r</button>
                     </div>
                     <div class="search" style="margin-top: 20px;">
                         <h4 style="font-weight: bold; text-align: left;">search</h4>
@@ -88,9 +88,9 @@
             {% endif %}
         {% else %}
             <div id="spotify-login">
-                <p style="font-weight: bold; color:#302c2c">want the webplayer?</p>
-                <p style="font-weight: bold; color:#302c2c">note: feature only available to admin approved users</p>
-                <button class="btn btn-primary" type="button" id="login" style="color: #bfbfbf; background-color: #302c2c">login to spotify</a>
+                <p style="font-weight: bold; color:#222020">want the webplayer?</p>
+                <p style="font-weight: bold; color:#222020">note: feature only available to admin approved users</p>
+                <button class="btn btn-primary" type="button" id="login" style="color: #CCCCCC; background-color: #222020">login to spotify</a>
             </div>
             <script>
                 $('#login').on('click', function() {

@@ -19,8 +19,8 @@
     {% if error %}
     <div class="row">
         <div class="col-12">
-            <p style="color: #302c2c; font-weight: bold;">{{ error }}</p>
-            <p style="font-weight: bold; color:#302c2c">User might not be registered by admin in the Developer Dashboard.</p>
+            <p style="color: #222020; font-weight: bold;">{{ error }}</p>
+            <p style="font-weight: bold; color:#222020">User might not be registered by admin in the Developer Dashboard.</p>
         </div>
     </div>
     {% else %}
@@ -46,7 +46,7 @@
             </div>
             </li>
             <li class="form-submit">
-            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #CCCCCC; background-color: #222020;">
                 <p style="margin-top: 10px;">save playlist</p>
             </button>
             </li>
@@ -74,7 +74,7 @@
             </div>
             </li>
             <li class="form-submit">
-            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #CCCCCC; background-color: #222020;">
                 <p style="margin-top: 10px;">save playlist</p>
             </button>
             </li>
@@ -102,7 +102,7 @@
             </div>
             </li>
             <li class="form-submit">
-            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #bfbfbf; background-color: #302c2c;">
+            <button type="button" class="btn btn-default form-button" data-toggle="modal" data-target="#save-modal" style="color: #CCCCCC; background-color: #222020;">
                 <p style="margin-top: 10px;">save playlist</p>
             </button>
             </li>
@@ -174,7 +174,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #bfbfbf; background-color: #302c2c;">create playlist</button>
+                <button class="btn btn-info btn-block" id="createBtn" type="button" data-dismiss="modal" style="color: #CCCCCC; background-color: #222020;">create playlist</button>
             </form>
         </div>
     </div>
@@ -183,9 +183,9 @@
 {% else %}
 <div class="row">
     <div class="col-12 text-center">
-        <p style="color: #302c2c; font-weight: bold;">you must be logged in to discover new music.</p>
-        <p style="font-weight: bold; color:#302c2c">note: feature only available to admin approved users</p>
-        <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #bfbfbf; background-color: #302c2c;">login to spotify</button>
+        <p style="color: #222020; font-weight: bold;">you must be logged in to discover new music.</p>
+        <p style="font-weight: bold; color:#222020">note: feature only available to admin approved users</p>
+        <button class="btn btn-default" type="button" onclick="window.location.href='/login'" style="color: #CCCCCC; background-color: #222020;">login to spotify</button>
     </div>
 </div>
 {% endif %}
