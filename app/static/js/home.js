@@ -70,11 +70,7 @@ window.onSpotifyWebPlaybackSDKReady = () => {
                 console.log(response);
                 $("#spotify-connect").hide();
                 $(".player-container").show();
-
-                setTimeout(() => {
-                    window.spotifyPlayer.setVolume(0.5);
-                    window.spotifyPlayer.pause();
-                }, 1000);
+                window.spotifyPlayer.setVolume(0.5);
             },
             error: function (error) {
                 // Handle errors if the API call fails
