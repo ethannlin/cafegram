@@ -105,7 +105,7 @@ def discover_create():
             if playlist is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
 
-            tracks = get_tracks(session, 'short_term', 100)
+            tracks = get_tracks(session, 'short_term', 50)
             if tracks is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
             track_uris = []
@@ -120,7 +120,7 @@ def discover_create():
             if playlist is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
 
-            tracks = get_tracks(session, 'medium_term', 100)
+            tracks = get_tracks(session, 'medium_term', 50)
             if tracks is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
             track_uris = []
@@ -135,7 +135,7 @@ def discover_create():
             if playlist is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not create playlist.')
 
-            tracks = get_tracks(session, 'long_term', 100)
+            tracks = get_tracks(session, 'long_term', 50)
             if tracks is None:
                 return render_template('discover.html', title='discover', token=session['token'], track_ids=[], error='Error: Could not retrieve tracks.')
             track_uris = []
